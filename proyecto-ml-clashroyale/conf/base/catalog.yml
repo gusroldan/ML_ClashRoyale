@@ -5,21 +5,21 @@
 
 # Datasets de batallas - datos principales de combates
 Combates1:
-  type: pandas.CSVDataSet
+  type: kedro_datasets.pandas.CSVDataset
   filepath: data/01_raw/battlesStaging_12272020_WL_tagged.csv
   load_args:
     encoding: utf-8
     low_memory: false
 
 Combates2:
-  type: pandas.CSVDataSet
+  type: kedro_datasets.pandas.CSVDataset
   filepath: data/01_raw/BattlesStaging_12312020_WL_tagged.csv
   load_args:
     encoding: utf-8
     low_memory: false
 
 Combates3:
-  type: pandas.CSVDataSet
+  type: kedro_datasets.pandas.CSVDataset
   filepath: data/01_raw/BattlesStaging_01042021_WL_tagged.csv
   load_args:
     encoding: utf-8
@@ -28,14 +28,54 @@ Combates3:
 
 # Lista maestra de cartas - catálogo de todas las cartas disponibles
 card_master_list:
-  type: pandas.CSVDataSet
+  type: kedro_datasets.pandas.CSVDataset
   filepath: data/01_raw/CardMasterListSeason18_12082020.csv
   load_args:
     encoding: utf-8
 
 # Cartas consideradas como win conditions
 wincons:
-  type: pandas.CSVDataSet
+  type: kedro_datasets.pandas.CSVDataset
   filepath: data/01_raw/Wincons.csv
   load_args:
     encoding: utf-8
+
+# Datasets limpios - resultado de la limpieza inicial
+Combates1_cleaned:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/02_intermediate/Combates1_cleaned.csv
+  save_args:
+    index: false
+
+Combates2_cleaned:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/02_intermediate/Combates2_cleaned.csv
+  save_args:
+    index: false
+
+Combates3_cleaned:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/02_intermediate/Combates3_cleaned.csv
+  save_args:
+    index: false
+
+# Resultados de la Fase 1: Comprensión del Negocio
+business_objectives_analysis:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/business_objectives_analysis.pkl
+
+current_situation_evaluation:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/current_situation_evaluation.pkl
+
+ml_objectives_definition:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/ml_objectives_definition.pkl
+
+project_plan:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/project_plan.pkl
+
+business_understanding_summary:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/business_understanding_summary.pkl
