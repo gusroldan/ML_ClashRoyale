@@ -2,3 +2,40 @@
 #
 # Documentation for this file format can be found in "The Data Catalog"
 # Link: https://docs.kedro.org/en/stable/data/data_catalog.html
+
+# Datasets de batallas - datos principales de combates
+Combates1:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/battlesStaging_12272020_WL_tagged.csv
+  load_args:
+    encoding: utf-8
+    low_memory: false
+
+Combates2:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/BattlesStaging_12312020_WL_tagged.csv
+  load_args:
+    encoding: utf-8
+    low_memory: false
+
+Combates3:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/BattlesStaging_01042021_WL_tagged.csv
+  load_args:
+    encoding: utf-8
+    low_memory: false
+
+
+# Lista maestra de cartas - catálogo de todas las cartas disponibles
+card_master_list:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/CardMasterListSeason18_12082020.csv
+  load_args:
+    encoding: utf-8
+
+# Cartas consideradas como win conditions
+wincons:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/Wincons.csv
+  load_args:
+    encoding: utf-8
