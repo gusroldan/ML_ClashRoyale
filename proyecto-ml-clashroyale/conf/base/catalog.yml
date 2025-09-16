@@ -2,3 +2,116 @@
 #
 # Documentation for this file format can be found in "The Data Catalog"
 # Link: https://docs.kedro.org/en/stable/data/data_catalog.html
+
+# Datasets de batallas - datos principales de combates
+Combates1:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/01_raw/battlesStaging_12272020_WL_tagged.csv
+  load_args:
+    encoding: utf-8
+    low_memory: false
+
+Combates2:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/01_raw/BattlesStaging_12312020_WL_tagged.csv
+  load_args:
+    encoding: utf-8
+    low_memory: false
+
+Combates3:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/01_raw/BattlesStaging_01042021_WL_tagged.csv
+  load_args:
+    encoding: utf-8
+    low_memory: false
+
+
+# Lista maestra de cartas - catálogo de todas las cartas disponibles
+card_master_list:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/01_raw/CardMasterListSeason18_12082020.csv
+  load_args:
+    encoding: utf-8
+
+# Cartas consideradas como win conditions
+wincons:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/01_raw/Wincons.csv
+  load_args:
+    encoding: utf-8
+
+# Datasets limpios - resultado de la limpieza inicial
+Combates1_cleaned:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/02_intermediate/Combates1_cleaned.csv
+  save_args:
+    index: false
+
+Combates2_cleaned:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/02_intermediate/Combates2_cleaned.csv
+  save_args:
+    index: false
+
+Combates3_cleaned:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/02_intermediate/Combates3_cleaned.csv
+  save_args:
+    index: false
+
+# Resultados de la Fase 1: Comprensión del Negocio
+business_objectives_analysis:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/business_objectives_analysis.pkl
+
+current_situation_evaluation:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/current_situation_evaluation.pkl
+
+ml_objectives_definition:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/ml_objectives_definition.pkl
+
+project_plan:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/project_plan.pkl
+
+business_understanding_summary:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/business_understanding_summary.pkl
+
+# Resultados del Pipeline EDA
+rarity_distributions_analysis:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/eda/rarity_distributions_analysis.pkl
+
+most_used_cards_analysis:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/eda/most_used_cards_analysis.pkl
+
+win_conditions_usage_analysis:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/eda/win_conditions_usage_analysis.pkl
+
+eda_summary:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/eda/eda_summary.pkl
+
+# Resultados del Pipeline de Preparación de Datos
+selected_datasets:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/data_preparation/selected_datasets.pkl
+
+combined_dataset:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/03_primary/combined_dataset.csv
+  save_args:
+    index: false
+
+dataset_validation:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/data_preparation/dataset_validation.pkl
+
+data_preparation_summary:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/data_preparation/data_preparation_summary.pkl

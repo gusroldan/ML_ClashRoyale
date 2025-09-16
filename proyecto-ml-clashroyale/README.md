@@ -1,101 +1,347 @@
-# Proyecto ML ClashRoyale
+# 🏰 Proyecto ML ClashRoyale
 
 [![Powered by Kedro](https://img.shields.io/badge/powered_by-kedro-ffc900?logo=kedro)](https://kedro.org)
+[![Python](https://img.shields.io/badge/python-3.8%2B-blue)](https://python.org)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-## Overview
+## 🎥 Video Explicativo
 
-This is your new Kedro project, which was generated using `kedro 1.0.0`.
+📺 **[Ver Video del Proyecto](https://www.youtube.com/watch?v=TU_VIDEO_AQUI)** - Explicación completa del proyecto, metodología CRISP-DM y resultados obtenidos.
 
-Take a look at the [Kedro documentation](https://docs.kedro.org) to get started.
+## 👥 Autores
 
-## Rules and guidelines
+- **Nicolás Hernández** - *Desarrollo y Análisis* - [GitHub](https://github.com/nicolas-hernandez)
+- **Gustavo Roldán** - *Desarrollo y Análisis* - [GitHub](https://github.com/gustavo-roldan)
 
-In order to get the best out of the template:
+## 📋 Descripción del Proyecto
 
-* Don't remove any lines from the `.gitignore` file we provide
-* Make sure your results can be reproduced by following a data engineering convention
-* Don't commit data to your repository
-* Don't commit any credentials or your local configuration to your repository. Keep all your credentials and local configuration in `conf/local/`
+Este proyecto implementa un pipeline de Machine Learning para analizar datos de combates de Clash Royale utilizando el framework **Kedro**. El proyecto sigue la metodología **CRISP-DM** y está diseñado para procesar y analizar millones de registros de batallas para identificar patrones, cartas más efectivas y estrategias ganadoras.
 
-## How to install dependencies
+### 🎯 Objetivos del Proyecto
 
-Declare any dependencies in `requirements.txt` for `pip` installation.
+- **Análisis Exploratorio de Datos (EDA)**: Identificar patrones en combates de Clash Royale
+- **Análisis de Cartas**: Determinar las cartas más utilizadas y efectivas
+- **Análisis de Win Conditions**: Evaluar la efectividad de diferentes estrategias
+- **Distribución de Rarezas**: Analizar la composición de mazos por rareza
+- **Preparación de Datos**: Unificar múltiples fuentes de datos para modelado
 
-To install them, run:
+### 📊 Datasets Incluidos
 
+Este proyecto utiliza el dataset **Clash Royale Season 18** disponible en Kaggle:
+
+🔗 **Fuente de Datos**: [Clash Royale Season 18 (Dec 03/20) Dataset](https://www.kaggle.com/datasets/bwandowando/clash-royale-season-18-dec-0320-dataset)
+
+**Archivos utilizados en `data/01_raw/`:**
+
+- **3 Datasets de Combates**: 
+  - `battlesStaging_12272020_WL_tagged.csv` - Combates del 27/12/2020
+  - `BattlesStaging_12312020_WL_tagged.csv` - Combates del 31/12/2020  
+  - `BattlesStaging_01042021_WL_tagged.csv` - Combates del 04/01/2021
+- **Lista Maestra de Cartas**: `CardMasterListSeason18_12082020.csv` - Catálogo completo de 102 cartas disponibles
+- **Win Conditions**: `Wincons.csv` - 24 condiciones de victoria identificadas
+
+**Total de registros**: Más de 5.6 millones de batallas analizadas
+
+## 🚀 Instalación Rápida
+
+### Prerrequisitos
+
+- Python 3.8 o superior
+- Git
+- 8GB RAM mínimo (recomendado para procesar datasets grandes)
+
+### 1. Obtener los Datos
+
+**Opción A: Descargar desde Kaggle**
+1. Visita el dataset: [Clash Royale Season 18 Dataset](https://www.kaggle.com/datasets/bwandowando/clash-royale-season-18-dec-0320-dataset)
+2. Descarga los siguientes archivos a la carpeta `data/01_raw/`:
+   - `battlesStaging_12272020_WL_tagged.csv`
+   - `BattlesStaging_12312020_WL_tagged.csv`
+   - `BattlesStaging_01042021_WL_tagged.csv`
+   - `CardMasterListSeason18_12082020.csv`
+   - `Wincons.csv`
+
+
+### 2. Crear Entorno Virtual
+
+#### Windows (PowerShell):
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
 ```
+
+#### Windows (CMD):
+```cmd
+python -m venv venv
+venv\Scripts\activate
+```
+
+#### Linux/macOS:
+```bash
+python -m venv venv
+source venv/bin/activate
+```
+
+### 3. Instalar Dependencias
+
+```bash
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-## How to run your Kedro pipeline
+### 4. Verificar Instalación
 
-You can run your Kedro project with:
+```bash
+kedro info
+```
+
+Deberías ver la información de Kedro v1.0.0 con los plugins instalados.
+
+## 📁 Estructura del Proyecto
 
 ```
+proyecto-ml-clashroyale/
+├── 📂 conf/                    # Configuraciones
+│   ├── base/                   # Configuración base
+│   │   ├── catalog.yml         # Catálogo de datasets
+│   │   └── parameters.yml      # Parámetros del proyecto
+│   └── local/                  # Configuración local
+├── 📂 data/                    # Datos organizados por fases
+│   ├── 01_raw/                 # Datos originales de Kaggle (5 archivos)
+│   │   ├── battlesStaging_12272020_WL_tagged.csv
+│   │   ├── BattlesStaging_12312020_WL_tagged.csv
+│   │   ├── BattlesStaging_01042021_WL_tagged.csv
+│   │   ├── CardMasterListSeason18_12082020.csv
+│   │   └── Wincons.csv
+│   ├── 02_intermediate/        # Datos procesados
+│   └── 03_primary/             # Datos finales unificados
+├── 📂 src/proyecto_ml_clashroyale/
+│   └── pipelines/              # Pipelines de procesamiento
+│       ├── business_understanding/  # Fase 1 CRISP-DM
+│       ├── eda/                # Fase 2 CRISP-DM  
+│       └── data_preparation/   # Fase 3 CRISP-DM
+├── 📂 notebooks/               # Jupyter notebooks
+├── requirements.txt            # Dependencias Python
+└── README.md                   # Este archivo
+```
+
+## 🔧 Uso del Proyecto
+
+### Ejecutar Pipeline Completo
+
+```bash
 kedro run
 ```
 
-## How to test your Kedro project
+### Ejecutar Pipelines Específicos
 
-Have a look at the file `tests/test_run.py` for instructions on how to write your tests. You can run your tests as follows:
-
-```
-pytest
-```
-
-You can configure the coverage threshold in your project's `pyproject.toml` file under the `[tool.coverage.report]` section.
-
-
-## Project dependencies
-
-To see and update the dependency requirements for your project use `requirements.txt`. You can install the project requirements with `pip install -r requirements.txt`.
-
-[Further information about project dependencies](https://docs.kedro.org/en/stable/kedro_project_setup/dependencies.html#project-specific-dependencies)
-
-## How to work with Kedro and notebooks
-
-> Note: Using `kedro jupyter` or `kedro ipython` to run your notebook provides these variables in scope: `context`, 'session', `catalog`, and `pipelines`.
->
-> Jupyter, JupyterLab, and IPython are already included in the project requirements by default, so once you have run `pip install -r requirements.txt` you will not need to take any extra steps before you use them.
-
-### Jupyter
-To use Jupyter notebooks in your Kedro project, you need to install Jupyter:
-
-```
-pip install jupyter
+#### Fase 1: Comprensión del Negocio
+```bash
+kedro run --pipeline=business_understanding
 ```
 
-After installing Jupyter, you can start a local notebook server:
-
+#### Fase 2: Análisis Exploratorio de Datos (EDA)
+```bash
+kedro run --pipeline=eda
 ```
+
+#### Fase 3: Preparación de Datos
+```bash
+kedro run --pipeline=data_preparation
+```
+
+### Visualizar Pipeline (Opcional)
+
+```bash
+kedro viz
+```
+
+Abre tu navegador en `http://127.0.0.1:4141` para ver la visualización interactiva.
+
+### Trabajar con Jupyter Notebooks
+
+```bash
 kedro jupyter notebook
 ```
 
-### JupyterLab
-To use JupyterLab, you need to install it:
+O con JupyterLab:
 
-```
-pip install jupyterlab
-```
-
-You can also start JupyterLab:
-
-```
+```bash
 kedro jupyter lab
 ```
 
-### IPython
-And if you want to run an IPython session:
+## 📊 Resultados del Análisis
 
+### EDA - Análisis Exploratorio
+
+El pipeline de EDA genera los siguientes resultados:
+
+- **Distribución de Rarezas**: Análisis de composición de mazos
+- **Cartas Más Utilizadas**: Top 20 cartas con nombres legibles
+- **Win Conditions**: Análisis de efectividad de estrategias
+- **Resumen Ejecutivo**: Estadísticas consolidadas
+
+### Preparación de Datos
+
+- **Dataset Unificado**: 5,644,203 registros combinados
+- **29 Columnas Seleccionadas**: Variables relevantes para ML
+- **Validación Completa**: 0 duplicados, 0 valores faltantes
+
+## 🛠️ Configuración Avanzada
+
+### Parámetros del Proyecto
+
+Edita `conf/base/parameters.yml` para ajustar:
+
+```yaml
+# Ejemplo de parámetros personalizables
+eda_params:
+  top_cards_limit: 20
+  min_usage_threshold: 0.01
+
+data_preparation:
+  selected_columns:
+    - battle_id
+    - winner.tag
+    - loser.tag
+    # ... más columnas
 ```
-kedro ipython
+
+### Catálogo de Datos
+
+El archivo `conf/base/catalog.yml` define todos los datasets del proyecto:
+
+```yaml
+# Datasets de combates del dataset de Kaggle
+Combates1:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/01_raw/battlesStaging_12272020_WL_tagged.csv
+  load_args:
+    encoding: utf-8
+    low_memory: false
+
+Combates2:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/01_raw/BattlesStaging_12312020_WL_tagged.csv
+  load_args:
+    encoding: utf-8
+    low_memory: false
+
+Combates3:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/01_raw/BattlesStaging_01042021_WL_tagged.csv
+  load_args:
+    encoding: utf-8
+    low_memory: false
+
+# Datasets de referencia
+card_master_list:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/01_raw/CardMasterListSeason18_12082020.csv
+  load_args:
+    encoding: utf-8
+
+wincons:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/01_raw/Wincons.csv
+  load_args:
+    encoding: utf-8
 ```
 
-### How to ignore notebook output cells in `git`
-To automatically strip out all output cell contents before committing to `git`, you can use tools like [`nbstripout`](https://github.com/kynan/nbstripout). For example, you can add a hook in `.git/config` with `nbstripout --install`. This will run `nbstripout` before anything is committed to `git`.
 
-> *Note:* Your output cells will be retained locally.
+## 📈 Rendimiento y Recursos
 
-## Package your Kedro project
+### Requisitos del Sistema
 
-[Further information about building project documentation and packaging your project](https://docs.kedro.org/en/stable/tutorial/package_a_project.html)
+- **RAM**: 8GB mínimo (16GB recomendado)
+- **Almacenamiento**: 2GB libres
+- **CPU**: Multi-core recomendado para procesamiento paralelo
+
+### Tiempos de Ejecución Estimados
+
+- **Pipeline Completo**: 15-30 minutos
+- **EDA**: 5-10 minutos
+- **Preparación de Datos**: 10-20 minutos
+
+## 🐛 Solución de Problemas
+
+### Error: "kedro command not found"
+
+```bash
+# Asegúrate de que el entorno virtual esté activado
+source venv/bin/activate  # Linux/macOS
+# o
+.\venv\Scripts\activate  # Windows
+
+# Verifica la instalación
+pip list | grep kedro
+```
+
+### Error: "ModuleNotFoundError"
+
+```bash
+# Reinstala las dependencias
+pip install -r requirements.txt --force-reinstall
+```
+
+### Error de Memoria
+
+```bash
+# Para datasets grandes, considera procesar en chunks
+# Edita conf/base/parameters.yml para ajustar chunk_size
+```
+
+## 🤝 Contribución
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## 📝 Logs y Debugging
+
+Los logs se guardan en `info.log`. Para debugging:
+
+```bash
+# Ver logs en tiempo real
+tail -f info.log
+
+# Ejecutar con verbose
+kedro run --verbose
+```
+
+## 📚 Recursos Adicionales
+
+- [Documentación de Kedro](https://docs.kedro.org)
+- [Metodología CRISP-DM](https://www.ibm.com/docs/en/spss-modeler/saas?topic=dm-crisp-help-overview)
+- [Pandas Documentation](https://pandas.pydata.org/docs/)
+- [Scikit-learn](https://scikit-learn.org/)
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+
+## 👥 Autores del Proyecto
+
+- **Nicolás Hernández** - *Desarrollo y Análisis* - [GitHub](https://github.com/nicolas-hernandez)
+- **Gustavo Roldán** - *Desarrollo y Análisis* - [GitHub](https://github.com/gustavo-roldan)
+
+## 🙏 Agradecimientos
+
+- **Framework Kedro** por la excelente arquitectura y herramientas de pipeline
+- **bwandowando** por proporcionar el dataset [Clash Royale Season 18](https://www.kaggle.com/datasets/bwandowando/clash-royale-season-18-dec-0320-dataset) en Kaggle
+- **Supercell** y la comunidad de Clash Royale por los datos del juego
+- **Equipo de desarrollo** por las contribuciones al proyecto
+
+---
+
+## 📞 Soporte
+
+Si tienes problemas o preguntas:
+
+1. Revisa la sección de [Solución de Problemas](#-solución-de-problemas)
+2. Consulta los [Issues del proyecto](https://github.com/tu-usuario/ML_ClashRoyale/issues)
+3. Crea un nuevo issue con detalles del problema
+
+**¡Disfruta analizando datos de Clash Royale! 🏰⚔️**

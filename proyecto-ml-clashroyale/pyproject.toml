@@ -50,3 +50,6 @@ attr = "proyecto_ml_clashroyale.__version__"
 [tool.setuptools.packages.find]
 where = [ "src",]
 namespaces = false
+
+[tool.kedro_telemetry]
+project_id = "897f18a4751c4aeabb7863e9c79fca4b"
