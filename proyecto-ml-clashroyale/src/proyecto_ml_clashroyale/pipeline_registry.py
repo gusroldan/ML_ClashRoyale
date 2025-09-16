@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from kedro.framework.project import find_pipelines
 from kedro.pipeline import Pipeline
-from .pipelines import create_business_understanding_pipeline
+from .pipelines import create_business_understanding_pipeline, create_eda_pipeline, create_data_preparation_pipeline
 
 
 def register_pipelines() -> dict[str, Pipeline]:
@@ -16,6 +16,12 @@ def register_pipelines() -> dict[str, Pipeline]:
     
     # Pipeline específico para comprensión del negocio
     pipelines["business_understanding"] = create_business_understanding_pipeline()
+    
+    # Pipeline específico para análisis exploratorio de datos
+    pipelines["eda"] = create_eda_pipeline()
+    
+    # Pipeline específico para preparación de datos
+    pipelines["data_preparation"] = create_data_preparation_pipeline()
     
     # Pipeline por defecto incluye todos los pipelines
     pipelines["__default__"] = sum(pipelines.values())

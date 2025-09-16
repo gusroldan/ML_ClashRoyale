@@ -79,3 +79,39 @@ project_plan:
 business_understanding_summary:
   type: kedro_datasets.pickle.PickleDataset
   filepath: data/02_intermediate/business_understanding_summary.pkl
+
+# Resultados del Pipeline EDA
+rarity_distributions_analysis:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/eda/rarity_distributions_analysis.pkl
+
+most_used_cards_analysis:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/eda/most_used_cards_analysis.pkl
+
+win_conditions_usage_analysis:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/eda/win_conditions_usage_analysis.pkl
+
+eda_summary:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/eda/eda_summary.pkl
+
+# Resultados del Pipeline de Preparación de Datos
+selected_datasets:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/data_preparation/selected_datasets.pkl
+
+combined_dataset:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/03_primary/combined_dataset.csv
+  save_args:
+    index: false
+
+dataset_validation:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/data_preparation/dataset_validation.pkl
+
+data_preparation_summary:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/02_intermediate/data_preparation/data_preparation_summary.pkl
