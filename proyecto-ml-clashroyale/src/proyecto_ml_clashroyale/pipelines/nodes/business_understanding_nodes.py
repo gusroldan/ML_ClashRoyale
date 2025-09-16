@@ -198,7 +198,7 @@ def define_ml_objectives(business_objectives: Dict[str, Any],
 def generate_project_plan(business_objectives: Dict[str, Any], 
                          current_situation: Dict[str, Any],
                          ml_objectives: Dict[str, Any]) -> Dict[str, Any]:
-    """Generar plan detallado del proyecto.
+    """Generar plan simplificado del proyecto.
     
     Args:
         business_objectives: Análisis de objetivos del negocio
@@ -206,64 +206,35 @@ def generate_project_plan(business_objectives: Dict[str, Any],
         ml_objectives: Objetivos de ML definidos
         
     Returns:
-        Diccionario con plan del proyecto
+        Diccionario con plan simplificado del proyecto
     """
-    logger.info("Generando plan del proyecto...")
+    logger.info("Generando plan simplificado del proyecto...")
     
     project_plan = {
         "fases_crisp_dm": {
             "fase_1": {
                 "nombre": "Comprensión del Negocio",
-                "estado": "En progreso",
+                "estado": "Completado",
                 "actividades": [
                     "Definir objetivos del proyecto",
                     "Evaluar situación actual",
-                    "Determinar objetivos de ML",
-                    "Producir plan del proyecto"
+                    "Determinar objetivos de ML"
                 ]
             },
             "fase_2": {
                 "nombre": "Comprensión de los Datos",
-                "estado": "Pendiente",
+                "estado": "En progreso",
                 "actividades": [
-                    "Recolectar datos iniciales",
-                    "Describir los datos",
                     "Explorar los datos (EDA)",
-                    "Verificar calidad de los datos"
-                ]
-            },
-            "fase_3": {
-                "nombre": "Preparación de los Datos",
-                "estado": "Pendiente",
-                "actividades": [
-                    "Seleccionar datos relevantes",
-                    "Limpiar los datos",
-                    "Construir nuevas variables",
-                    "Integrar datos de múltiples fuentes"
+                    "Analizar distribuciones de variables",
+                    "Identificar cartas más utilizadas",
+                    "Evaluar efectividad de win conditions"
                 ]
             }
-        },
-        "entregables": [
-            "Análisis de objetivos del negocio",
-            "Evaluación de situación actual",
-            "Objetivos de ML definidos",
-            "Plan del proyecto",
-            "Resumen ejecutivo"
-        ],
-        "recursos_necesarios": [
-            "Datos de batallas históricas",
-            "Catálogo de cartas",
-            "Lista de win conditions",
-            "Herramientas de análisis (pandas, numpy, matplotlib)"
-        ],
-        "cronograma": {
-            "fase_1": "1-2 días",
-            "fase_2": "3-5 días", 
-            "fase_3": "2-3 días"
         }
     }
     
-    logger.info("Plan del proyecto generado exitosamente")
+    logger.info("Plan simplificado del proyecto generado exitosamente")
     return project_plan
 
 
@@ -293,16 +264,15 @@ def create_business_summary(business_objectives: Dict[str, Any],
             "valor_esperado": business_objectives["valor_esperado"]
         },
         "siguientes_pasos": [
-            "Proceder con Fase 2: Comprensión de los Datos",
-            "Realizar EDA detallado de los datasets",
-            "Limpiar y preparar datos para análisis",
-            "Implementar análisis de cartas populares"
+            "Ejecutar pipeline de EDA",
+            "Analizar distribuciones de variables clave",
+            "Identificar cartas más utilizadas",
+            "Evaluar efectividad de win conditions"
         ],
         "recomendaciones": [
-            "Enfocar análisis en mazos ganadores",
-            "Considerar factores temporales en los datos",
-            "Validar resultados con múltiples métricas",
-            "Documentar hallazgos para futuras iteraciones"
+            "Enfocar análisis en patrones de uso de cartas",
+            "Identificar win conditions más efectivas",
+            "Analizar correlaciones entre variables clave"
         ]
     }
     
