@@ -26,8 +26,13 @@ def select_relevant_columns(combates1_cleaned: pd.DataFrame,
     # Definir las columnas que necesitamos
     relevant_columns = [
         'battle_id',
+        'average.startingTrophies',
         'winner.tag',
+        'winner.startingTrophies',
+        'winner.trophyChange',
         'loser.tag',
+        'loser.startingTrophies',
+        'loser.trophyChange',
         'winner.card1.id', 'winner.card2.id', 'winner.card3.id', 'winner.card4.id',
         'winner.card5.id', 'winner.card6.id', 'winner.card7.id', 'winner.card8.id',
         'winner.cards.list',
