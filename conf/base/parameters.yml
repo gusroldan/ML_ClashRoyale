@@ -1,0 +1,75 @@
+# Feature Engineering parameters
+feature_engineering:
+  test_size: 0.2
+  random_state: 42
+  max_samples_per_class: 50000  # Número de muestras por clase (reducido para usar menos recursos)
+                                  # Total = max_samples_per_class * 2 = 100K registros
+                                  # Ejemplos:
+                                  # 50000 = 100K total (rápido, menos recursos)
+                                  # 100000 = 200K total (más rápido para pruebas)
+                                  # 250000 = 500K total (rápido)
+                                  # 500000 = 1M total (recomendado)
+                                  # 1000000 = 2M total (más lento pero mejor calidad)
+
+# Classification parameters
+classification:
+  cv_folds: 3  # Reducido de 5 a 3 para usar menos recursos
+  scoring: 'roc_auc'
+  random_state: 42
+  models:
+    logistic_regression:
+      param_grid:
+        C: [0.1, 1.0]  # Reducido de 3 a 2 valores
+        penalty: ['l2']  # Solo L2 para simplificar
+        solver: ['saga']
+    random_forest:
+      param_grid:
+        n_estimators: [100, 200]  # Reducido de 3 a 2 valores
+        max_depth: [10, 20]  # Removido None para reducir combinaciones
+        min_samples_split: [2]  # Solo un valor
+    xgboost:
+      param_grid:
+        max_depth: [3, 5]  # Reducido de 3 a 2 valores
+        learning_rate: [0.1, 0.3]  # Reducido de 3 a 2 valores
+        n_estimators: [100]  # Solo un valor
+    svc:
+      param_grid:
+        C: [1.0]  # Solo un valor para acelerar (LinearSVC es mucho más rápido)
+    lightgbm:
+      param_grid:
+        max_depth: [3, 5]  # Reducido de 3 a 2 valores
+        learning_rate: [0.1, 0.3]  # Reducido de 3 a 2 valores
+        n_estimators: [100]  # Solo un valor
+
+# Regression parameters
+regression:
+  cv_folds: 3  # Aún más reducido para usar menos recursos
+  scoring: 'neg_mean_absolute_error'
+  random_state: 42
+  models:
+    linear_regression:
+      param_grid:
+        fit_intercept: [True]  # Solo un valor para simplificar
+    ridge:
+      param_grid:
+        alpha: [0.1, 1.0, 10.0]  # Reducido de 4 a 3 valores
+    random_forest:
+      param_grid:
+        n_estimators: [50]  # Menos árboles
+        max_depth: [10]  # Profundidad fija
+        max_features: ['sqrt']  # Menos variables por split
+        min_samples_leaf: [2]  # Hojas mínimas para reducir sobreajuste y coste
+    xgboost:
+      param_grid:
+        max_depth: [3, 5]  # Reducido de 3 a 2 valores
+        learning_rate: [0.1, 0.3]  # Reducido de 3 a 2 valores
+        n_estimators: [100]  # Solo un valor
+    svr:
+      param_grid:
+        C: [1.0]  # Valor único para acelerar
+        epsilon: [0.1]  # Valor único
+    lightgbm:
+      param_grid:
+        max_depth: [3, 5]  # Reducido de 3 a 2 valores
+        learning_rate: [0.1, 0.3]  # Reducido de 3 a 2 valores
+        n_estimators: [100]  # Solo un valor

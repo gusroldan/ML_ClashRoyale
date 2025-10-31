@@ -115,3 +115,159 @@ dataset_validation:
 data_preparation_summary:
   type: kedro_datasets.pickle.PickleDataset
   filepath: data/02_intermediate/data_preparation/data_preparation_summary.pkl
+
+# Feature Engineering datasets
+card_dictionary:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/04_feature/card_dictionary.pkl
+
+balanced_dataset:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/04_feature/balanced_dataset.csv
+  save_args:
+    index: false
+
+features_multihot:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/04_feature/features_multihot.csv
+  save_args:
+    index: false
+
+features_aggregate:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/04_feature/features_aggregate.csv
+  save_args:
+    index: false
+
+features_combined:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/04_feature/features_combined.csv
+  save_args:
+    index: false
+
+# Model Input datasets
+train_data:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/05_model_input/train_data.csv
+  save_args:
+    index: false
+
+test_data:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/05_model_input/test_data.csv
+  save_args:
+    index: false
+
+# Model Outputs - Clasificación
+logistic_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/classification/logistic_regression_model.pkl
+
+logistic_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/logistic_metrics.json
+
+rf_clf_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/classification/random_forest_model.pkl
+
+rf_clf_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/random_forest_metrics.json
+
+xgb_clf_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/classification/xgboost_model.pkl
+
+xgb_clf_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/xgboost_metrics.json
+
+svc_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/classification/svc_model.pkl
+
+svc_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/svc_metrics.json
+
+lgbm_clf_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/classification/lightgbm_model.pkl
+
+lgbm_clf_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/lightgbm_metrics.json
+
+classification_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/classification_metrics.json
+
+# Model Outputs - Regresión
+linear_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/regression/linear_regression_model.pkl
+
+linear_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/linear_metrics.json
+
+ridge_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/regression/ridge_model.pkl
+
+ridge_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/ridge_metrics.json
+
+rf_reg_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/regression/random_forest_model.pkl
+
+rf_reg_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/random_forest_reg_metrics.json
+
+xgb_reg_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/regression/xgboost_model.pkl
+
+xgb_reg_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/xgboost_reg_metrics.json
+
+svr_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/regression/svr_model.pkl
+
+svr_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/svr_metrics.json
+
+lgbm_reg_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/regression/lightgbm_model.pkl
+
+lgbm_reg_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/lightgbm_reg_metrics.json
+
+regression_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/regression_metrics.json
+
+classification_comparison:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/08_reporting/classification_comparison.json
+
+regression_comparison:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/08_reporting/regression_comparison.json
+
+final_report:
+  type: kedro_datasets.text.TextDataSet
+  filepath: data/08_reporting/final_report.md
+
+comparison_plots:
+  type: kedro_datasets.plotly.PlotlyDataset
+  filepath: data/08_reporting/comparison_plots.html
