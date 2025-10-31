@@ -1,0 +1,38 @@
+stages:
+  feature_engineering:
+    cmd: kedro run --pipeline=feature_engineering
+    deps:
+      - data/03_primary/combined_dataset.csv
+      - data/01_raw/CardMasterListSeason18_12082020.csv
+    outs:
+      - data/04_feature/
+      - data/05_model_input/
+    metrics:
+      - data/08_reporting/feature_engineering_stats.json:
+          cache: false
+
+  classification:
+    cmd: kedro run --pipeline=classification
+    deps:
+      - data/05_model_input/train_data.csv
+      - data/05_model_input/test_data.csv
+    outs:
+      - data/06_models/classification/:
+          persist: true
+    metrics:
+      - data/07_model_output/classification_metrics.json:
+          cache: false
+
+  regression:
+    cmd: kedro run --pipeline=regression
+    deps:
+      - data/05_model_input/train_data.csv
+      - data/05_model_input/test_data.csv
+    outs:
+      - data/06_models/regression/:
+          persist: true
+    metrics:
+      - data/07_model_output/regression_metrics.json:
+          cache: false
+
+

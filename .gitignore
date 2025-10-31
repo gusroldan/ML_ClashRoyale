@@ -165,3 +165,12 @@ venv.bak/
 
 # mlflow local runs
 mlruns/*
+
+# Airflow local artifacts
+airflow/airflow.db*
+airflow/airflow.cfg
+airflow/logs/
+airflow/*.pid
+airflow/webserver_config.py
+airflow/standalone_admin_password.txt
+airflow/simple_auth_manager_passwords.json*
