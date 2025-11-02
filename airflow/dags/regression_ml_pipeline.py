@@ -20,18 +20,18 @@ dag = DAG(
     catchup=False,
 )
 
-# Path del proyecto en WSL
-PROJECT_ROOT = "/mnt/c/Users/Usuario/Documents/GitHub/ML_ClashRoyale"
+# Path del proyecto en el contenedor Docker
+PROJECT_ROOT = "/app"
 
 feature_engineering = BashOperator(
     task_id='feature_engineering',
-    bash_command=f'cd {PROJECT_ROOT} && set -e && venv/bin/python -m kedro run --pipeline=feature_engineering',
+    bash_command=f'cd {PROJECT_ROOT} && set -e && python -m kedro run --pipeline=feature_engineering',
     dag=dag,
 )
 
 regression = BashOperator(
     task_id='regression_pipeline',
-    bash_command=f'cd {PROJECT_ROOT} && set -e && venv/bin/python -m kedro run --pipeline=regression',
+    bash_command=f'cd {PROJECT_ROOT} && set -e && python -m kedro run --pipeline=regression',
     dag=dag,
 )
 

@@ -20,31 +20,34 @@ dag = DAG(
     catchup=False,
 )
 
+# Path del proyecto en el contenedor Docker
+PROJECT_ROOT = "/app"
+
 # Tarea 1: Preparación de datos (pipelines existentes)
 data_cleaning = BashOperator(
     task_id='data_cleaning',
-    bash_command='cd /mnt/c/Users/Usuario/Documents/GitHub/ML_ClashRoyale && set -e && venv/bin/python -m kedro run --pipeline=data_preparation',
+    bash_command=f'cd {PROJECT_ROOT} && set -e && python -m kedro run --pipeline=data_preparation',
     dag=dag,
 )
 
 # Tarea 2: Feature Engineering
 feature_engineering = BashOperator(
     task_id='feature_engineering',
-    bash_command='cd /mnt/c/Users/Usuario/Documents/GitHub/ML_ClashRoyale && set -e && venv/bin/python -m kedro run --pipeline=feature_engineering',
+    bash_command=f'cd {PROJECT_ROOT} && set -e && python -m kedro run --pipeline=feature_engineering',
     dag=dag,
 )
 
 # Tarea 3: Pipeline de Clasificación
 classification = BashOperator(
     task_id='classification_pipeline',
-    bash_command='cd /mnt/c/Users/Usuario/Documents/GitHub/ML_ClashRoyale && set -e && venv/bin/python -m kedro run --pipeline=classification',
+    bash_command=f'cd {PROJECT_ROOT} && set -e && python -m kedro run --pipeline=classification',
     dag=dag,
 )
 
 # Tarea 4: Pipeline de Regresión
 regression = BashOperator(
     task_id='regression_pipeline',
-    bash_command='cd /mnt/c/Users/Usuario/Documents/GitHub/ML_ClashRoyale && set -e && venv/bin/python -m kedro run --pipeline=regression',
+    bash_command=f'cd {PROJECT_ROOT} && set -e && python -m kedro run --pipeline=regression',
     dag=dag,
 )
 

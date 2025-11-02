@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  airflow:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clashroyale_ml_airflow
+    environment:
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__API__AUTH_BACKENDS=airflow.auth.backends.simple_auth_manager
+      - AIRFLOW__WEBSERVER__SECRET_KEY=clashroyale_ml_secret_key_change_in_production
+      # Usuario admin (se crea automáticamente)
+      - AIRFLOW_ADMIN_USER=admin
+      - AIRFLOW_ADMIN_PASSWORD=admin
+      - AIRFLOW_ADMIN_EMAIL=admin@clashroyale.local
+    volumes:
+      # Montar código del proyecto
+      - .:/app:rw
+      # Montar DAGs (para desarrollo, cambios sin rebuild)
+      - ./airflow/dags:/opt/airflow/dags:ro
+      # Persistir datos de Airflow
+      - airflow-db:/opt/airflow
+      - airflow-logs:/opt/airflow/logs
+      # Montar datos desde el host (acceso directo a los datos sin incluirlos en la imagen)
+      - ./data:/app/data:rw
+    ports:
+      - "8080:8080"
+    command: standalone
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health').read()"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+volumes:
+  airflow-db:
+    driver: local
+  airflow-logs:
+    driver: local
+

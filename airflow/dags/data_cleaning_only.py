@@ -20,11 +20,12 @@ dag = DAG(
     catchup=False,
 )
 
-PROJECT_ROOT = "/mnt/c/Users/Usuario/Documents/GitHub/ML_ClashRoyale"
+# Path del proyecto en el contenedor Docker
+PROJECT_ROOT = "/app"
 
 data_cleaning = BashOperator(
     task_id='data_cleaning',
-    bash_command=f'cd {PROJECT_ROOT} && set -e && venv/bin/python -m kedro run --pipeline=data_preparation',
+    bash_command=f'cd {PROJECT_ROOT} && set -e && python -m kedro run --pipeline=data_preparation',
     dag=dag,
 )
 

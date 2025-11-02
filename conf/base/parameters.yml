@@ -2,7 +2,7 @@
 feature_engineering:
   test_size: 0.2
   random_state: 42
-  max_samples_per_class: 50000  # Número de muestras por clase (reducido para usar menos recursos)
+  max_samples_per_class: 5000  # Número de muestras por clase (reducido para usar menos recursos)
                                   # Total = max_samples_per_class * 2 = 100K registros
                                   # Ejemplos:
                                   # 50000 = 100K total (rápido, menos recursos)

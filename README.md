@@ -205,9 +205,97 @@ kedro run --pipeline=regression --tags lightgbm
 - classification.cv_folds / regression.cv_folds: folds de GridSearchCV (p.ej. 3).
 - Grids reducidos para menor consumo de recursos.
 
-## 🪪 Airflow (WSL) – Orquestación
+## 🪪 Airflow – Orquestación
 
-Rutas Linux en DAGs (`/mnt/c/...`) y ejecución de Kedro con `venv/bin/python -m kedro`.
+### Opción 1: Docker (Recomendado para Windows)
+
+Docker permite ejecutar Airflow sin necesidad de WSL, con todas las dependencias preconfiguradas. **Solo incluye código + dependencias** (~1-2 GB), los datos se montan como volumen.
+
+#### 📋 Prerrequisitos
+1. **Docker Desktop** instalado y ejecutándose en Windows
+2. **Docker Compose** (incluido en Docker Desktop)
+
+#### 🚀 Pasos rápidos (resumen)
+
+```bash
+# 1. Verificar Docker
+docker --version
+
+# 2. Navegar al proyecto
+cd C:\Users\Usuario\Documents\GitHub\ML_ClashRoyale
+
+# 3. Construir imagen (solo código + dependencias, ~1-2 GB)
+docker-compose build
+
+# 4. Iniciar Airflow
+docker-compose up -d
+
+# 5. Ver logs (opcional)
+docker-compose logs -f airflow
+
+# 6. Acceder a http://localhost:8080
+# Usuario: admin | Contraseña: admin
+```
+
+⏱️ **Tiempo estimado:** 5-15 minutos (primera vez)  
+📦 **Tamaño imagen:** ~1-2 GB (datos se montan como volumen, no se incluyen)
+
+**📖 Guía completa paso a paso:** Ver [`DOCKER_GUIDE.md`](DOCKER_GUIDE.md) para instrucciones detalladas y solución de problemas.
+
+#### 🛑 Detener Airflow
+```bash
+# Detener (mantiene volúmenes)
+docker-compose down
+
+# Detener y eliminar volúmenes (reset completo de BD)
+docker-compose down -v
+```
+
+#### 🔄 Reiniciar Airflow
+```bash
+# Si ya construiste la imagen antes
+docker-compose up -d
+
+# Si necesitas reconstruir (después de cambios en Dockerfile)
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+#### DAGs disponibles en Docker
+Todos los DAGs están configurados para usar rutas del contenedor (`/app`):
+- `clashroyale_ml_with_datacleaning` (completo: data_preparation → feature_engineering → [classification, regression])
+- `clashroyale_ml_no_datacleaning` (sin data_preparation: feature_engineering → [classification, regression])
+- `classification_ml_pipeline` (feature_engineering → classification)
+- `regression_ml_pipeline` (feature_engineering → regression)
+- `data_cleaning_only` (solo data_preparation)
+
+#### Volúmenes y persistencia
+- **Código del proyecto**: montado desde `./` (cambios en código se reflejan sin rebuild)
+- **DAGs**: montados desde `./airflow/dags` (cambios en DAGs sin rebuild)
+- **Base de datos**: se limpia automáticamente en cada inicio (se recrea desde cero)
+- **Logs**: persistidos en volumen `airflow-logs`
+- **Datos**: montados desde `./data` (opcional, para usar datos del host)
+
+**Nota importante**: La base de datos de Airflow se limpia y se recrea automáticamente cada vez que inicias el contenedor. Esto garantiza un estado limpio en cada ejecución.
+
+#### Solución de problemas
+```bash
+# Reconstruir imagen desde cero
+docker-compose build --no-cache
+
+# Ejecutar comandos dentro del contenedor
+docker-compose exec airflow bash
+
+# Verificar que Airflow está corriendo
+docker-compose ps
+
+# Limpiar todo (imágenes, contenedores, volúmenes)
+docker-compose down -v --rmi all
+```
+
+### Opción 2: WSL (Alternativa local)
+
+Si prefieres ejecutar Airflow directamente en WSL sin Docker:
 
 1) Preparar entorno
 ```bash
@@ -229,12 +317,7 @@ airflow standalone
 # UI: http://localhost:8080 (credenciales en airflow/simple_auth_manager_passwords.json.generated)
 ```
 
-3) DAGs disponibles
-- clashroyale_ml_with_datacleaning (completo)
-- clashroyale_ml_no_datacleaning (sin data_preparation)
-- classification_ml_pipeline (feature_engineering → classification)
-- regression_ml_pipeline (feature_engineering → regression)
-- data_cleaning_only (solo data_preparation)
+**Nota**: En WSL, los DAGs usan rutas WSL (`/mnt/c/...`). En Docker, usan rutas del contenedor (`/app`).
 
 
 ## 🎯 Objetivos de Modelado
