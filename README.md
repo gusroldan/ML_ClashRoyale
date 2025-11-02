@@ -6,7 +6,7 @@
 
 ## 🎥 Video Explicativo
 
-📺 **[Ver Video del Proyecto](https://drive.google.com/file/d/12JK-j3v5s3S2cdgWdI1WtRYYEJT-NT2h/view)** - Explicación completa del proyecto, metodología CRISP-DM y resultados obtenidos.
+📺 **[Ver Video del Proyecto](https://drive.google.com/file/d/1u7Hu_q1sVsORTLCiUOYVTHlWYbvGNu6k/view?usp=sharing)** - Explicacion de lo agregado al proyecto, con breve introduccion, objetivos, y aplicaciones utilizadas
 
 ## 👥 Autores
 
