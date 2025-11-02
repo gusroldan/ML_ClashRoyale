@@ -46,15 +46,17 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
     pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}" && \
     pip install --no-cache-dir -r requirements.txt
 
+# Copiar script de entrada PRIMERO (antes de cambiar usuario)
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh && \
+    # Asegurar que el shebang funcione correctamente (convertir CRLF a LF si es necesario)
+    sed -i 's/\r$//' /docker-entrypoint.sh || true
+
 # Copiar código del proyecto
 COPY . /app/
 
 # Crear estructura de directorios de Airflow
 RUN mkdir -p ${AIRFLOW_HOME}/dags ${AIRFLOW_HOME}/logs ${AIRFLOW_HOME}/plugins
-
-# Copiar y configurar script de entrada
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
 
 # Cambiar propietario de archivos antes de cambiar de usuario
 RUN chown -R airflow:airflow ${AIRFLOW_HOME} /app /docker-entrypoint.sh

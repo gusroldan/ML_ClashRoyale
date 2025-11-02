@@ -25,19 +25,43 @@ PROJECT_ROOT = "/app"
 
 feature_engineering = BashOperator(
     task_id='feature_engineering',
-    bash_command=f'cd {PROJECT_ROOT} && set -e && python -m kedro run --pipeline=feature_engineering',
+    bash_command=f'''
+        set -e
+        cd {PROJECT_ROOT} || {{ echo "Error: No se pudo cambiar a {PROJECT_ROOT}"; exit 1; }}
+        echo "Directorio actual: $(pwd)"
+        echo "Verificando que pyproject.toml existe..."
+        test -f pyproject.toml || {{ echo "Error: pyproject.toml no encontrado en {PROJECT_ROOT}"; ls -la; exit 1; }}
+        echo "Ejecutando pipeline: feature_engineering"
+        python -m kedro run --pipeline=feature_engineering
+    ''',
     dag=dag,
 )
 
 classification = BashOperator(
     task_id='classification_pipeline',
-    bash_command=f'cd {PROJECT_ROOT} && set -e && python -m kedro run --pipeline=classification',
+    bash_command=f'''
+        set -e
+        cd {PROJECT_ROOT} || {{ echo "Error: No se pudo cambiar a {PROJECT_ROOT}"; exit 1; }}
+        echo "Directorio actual: $(pwd)"
+        echo "Verificando que pyproject.toml existe..."
+        test -f pyproject.toml || {{ echo "Error: pyproject.toml no encontrado en {PROJECT_ROOT}"; ls -la; exit 1; }}
+        echo "Ejecutando pipeline: classification"
+        python -m kedro run --pipeline=classification
+    ''',
     dag=dag,
 )
 
 regression = BashOperator(
     task_id='regression_pipeline',
-    bash_command=f'cd {PROJECT_ROOT} && set -e && python -m kedro run --pipeline=regression',
+    bash_command=f'''
+        set -e
+        cd {PROJECT_ROOT} || {{ echo "Error: No se pudo cambiar a {PROJECT_ROOT}"; exit 1; }}
+        echo "Directorio actual: $(pwd)"
+        echo "Verificando que pyproject.toml existe..."
+        test -f pyproject.toml || {{ echo "Error: pyproject.toml no encontrado en {PROJECT_ROOT}"; ls -la; exit 1; }}
+        echo "Ejecutando pipeline: regression"
+        python -m kedro run --pipeline=regression
+    ''',
     dag=dag,
 )
 

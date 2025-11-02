@@ -19,11 +19,32 @@ Este proyecto implementa un pipeline de Machine Learning para analizar datos de 
 
 ### 🎯 Objetivos del Proyecto
 
+#### Análisis Exploratorio (CRISP-DM)
 - **Análisis Exploratorio de Datos (EDA)**: Identificar patrones en combates de Clash Royale
 - **Análisis de Cartas**: Determinar las cartas más utilizadas y efectivas
 - **Análisis de Win Conditions**: Evaluar la efectividad de diferentes estrategias
 - **Distribución de Rarezas**: Analizar la composición de mazos por rareza
 - **Preparación de Datos**: Unificar múltiples fuentes de datos para modelado
+
+#### Machine Learning - Modelos Entrenados
+
+**Clasificación (5 modelos)**:
+- **Objetivo**: Predecir si el jugador A gana o pierde la batalla (binario 1/0)
+- **Modelos**: Logistic Regression, Random Forest, XGBoost, LinearSVC, LightGBM
+- **Métricas**: Accuracy, Precision, Recall, F1-Score, ROC-AUC
+- **Técnica**: GridSearchCV con Cross-Validation (k≥3 folds)
+
+**Regresión (6 modelos)**:
+- **Objetivo**: Predecir el cambio de trofeos del jugador A (A.trophyChange, con signo)
+- **Modelos**: Linear Regression, Ridge, Random Forest, XGBoost, LinearSVR, LightGBM
+- **Métricas**: MAE, MSE, RMSE, R²
+- **Técnica**: GridSearchCV con Cross-Validation (k≥3 folds)
+
+**Feature Engineering**:
+- Re-etiquetado balanceado (50% A=winner, 50% A=loser)
+- Multi-hot encoding de 102 cartas (cards_diff = vec_A - vec_B)
+- Features agregadas (Δtrophies, conteos de rareza)
+- División train/test para validación
 
 ### 📊 Datasets Incluidos
 
@@ -100,7 +121,7 @@ Deberías ver la información de Kedro v1.0.0 con los plugins instalados.
 ## 📁 Estructura del Proyecto
 
 ```
-proyecto-ml-clashroyale/
+ML_ClashRoyale/
 ├── 📂 conf/                    # Configuraciones
 │   ├── base/                   # Configuración base
 │   │   ├── catalog.yml         # Catálogo de datasets
@@ -114,83 +135,326 @@ proyecto-ml-clashroyale/
 │   │   ├── CardMasterListSeason18_12082020.csv
 │   │   └── Wincons.csv
 │   ├── 02_intermediate/        # Datos procesados
-│   └── 03_primary/             # Datos finales unificados
+│   ├── 03_primary/             # Datos finales unificados
+│   ├── 04_feature/             # Features para ML
+│   ├── 05_model_input/          # Datos de entrenamiento/test
+│   ├── 06_models/              # Modelos entrenados
+│   │   ├── classification/     # Modelos de clasificación
+│   │   └── regression/         # Modelos de regresión
+│   ├── 07_model_output/        # Métricas por modelo (JSON)
+│   └── 08_reporting/           # Comparaciones y reportes
 ├── 📂 src/proyecto_ml_clashroyale/
 │   └── pipelines/              # Pipelines de procesamiento
 │       ├── business_understanding/  # Fase 1 CRISP-DM
 │       ├── eda/                # Fase 2 CRISP-DM  
-│       └── data_preparation/   # Fase 3 CRISP-DM
+│       ├── data_preparation/   # Fase 3 CRISP-DM
+│       ├── feature_engineering/ # Ingeniería de features
+│       ├── classification/     # Pipeline de clasificación
+│       └── regression/         # Pipeline de regresión
+├── 📂 airflow/                 # Configuración de Airflow
+│   ├── dags/                   # DAGs de Airflow (5 DAGs)
+│   ├── logs/                   # Logs de ejecución
+│   └── airflow.cfg             # Configuración de Airflow
 ├── 📂 notebooks/               # Jupyter notebooks
-├── requirements.txt            # Dependencias Python
-└── README.md                   # Este archivo
+├── Dockerfile                  # Imagen Docker
+├── docker-compose.yml          # Configuración Docker Compose
+├── docker-entrypoint.sh        # Script de inicio Docker
+├── dvc.yaml                    # Configuración DVC
+├── requirements.txt           # Dependencias Python
+└── README.md                  # Este archivo
 ```
 
-## 🔧 Uso del Proyecto
+## 🚀 Ejecución del Proyecto
 
-### Ejecutar Pipeline Completo
+El proyecto se puede ejecutar de dos formas:
 
+### Opción 1: Docker (Recomendado) 🐳
+
+**Ventajas**: Entorno completo preconfigurado, no requiere instalación local, funciona en Windows sin WSL.
+
+#### Prerrequisitos
+- Docker Desktop instalado y ejecutándose
+- Docker Compose (incluido en Docker Desktop)
+
+#### Pasos de instalación y ejecución
+
+**Paso 1: Construir la imagen Docker**
+```bash
+# IMPORTANTE: Ejecutar desde la raíz del proyecto (donde está docker-compose.yml)
+# Verificar que estás en el directorio correcto:
+ls docker-compose.yml pyproject.toml requirements.txt
+
+# Construir la imagen
+docker-compose build
+```
+⏱️ **Tiempo**: 5-15 minutos (primera vez)  
+📦 **Tamaño**: ~3.4 GB (solo código + dependencias, datos se montan como volumen)
+
+**⚠️ Nota importante sobre volúmenes:**
+El `docker-compose.yml` monta el código del proyecto como volumen (`.:/app:rw`). Esto significa:
+- **Ventaja**: Los cambios en el código se reflejan inmediatamente sin reconstruir la imagen
+- **Requisito**: El proyecto **debe estar completo** en el host donde ejecutas `docker-compose`
+- **Archivos necesarios**: `pyproject.toml`, `requirements.txt`, `src/`, `conf/`, `Dockerfile`, etc.
+- **Si el proyecto no está completo en el host**, el volumen montará un directorio incompleto y Kedro no encontrará el proyecto
+
+**Paso 2: Iniciar Airflow**
+```bash
+docker-compose up -d
+```
+
+**Paso 3: Acceder a la interfaz web**
+- URL: http://localhost:8080
+- Usuario: `admin`
+- Contraseña: `admin`
+
+**Paso 4: Ver logs (opcional)**
+```bash
+docker-compose logs -f airflow
+```
+
+**Paso 5: Detener Airflow**
+```bash
+docker-compose down
+```
+
+#### Comandos útiles de Docker
+```bash
+# Ver logs en tiempo real
+docker-compose logs -f airflow
+
+# Detener y limpiar volúmenes (reset completo de BD)
+docker-compose down -v
+
+# Reconstruir imagen después de cambios
+docker-compose build --no-cache
+docker-compose up -d
+
+# Ejecutar comandos dentro del contenedor
+docker-compose exec airflow bash
+
+# Ver estado del contenedor
+docker-compose ps
+```
+
+#### Solución de Problemas Comunes
+
+**Error: `exec /docker-entrypoint.sh: no such file or directory`**
+
+Este error suele ocurrir cuando el archivo `docker-entrypoint.sh` tiene finales de línea de Windows (CRLF) en lugar de Unix (LF).
+
+**Solución 1: Convertir finales de línea (Recomendado)**
+```bash
+# En Git Bash o WSL
+dos2unix docker-entrypoint.sh
+# O usando sed
+sed -i 's/\r$//' docker-entrypoint.sh
+
+# Luego reconstruir la imagen
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+**Solución 2: Usar editor que preserve formato Unix**
+- En VS Code: Cambiar "CRLF" a "LF" en la barra de estado (clic derecho → "Change End of Line Sequence")
+- Guardar el archivo `docker-entrypoint.sh` con finales de línea LF
+- Reconstruir: `docker-compose build --no-cache && docker-compose up -d`
+
+**Solución 3: Verificar que el archivo existe**
+```bash
+# Verificar que el archivo está en el directorio raíz
+ls -la docker-entrypoint.sh
+
+# Verificar permisos
+chmod +x docker-entrypoint.sh
+
+# Reconstruir desde cero
+docker-compose down -v
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+**Error: `Bash command failed. The command returned a non-zero exit code 2` (al ejecutar DAGs)**
+
+Este error puede tener varias causas:
+
+**Causa 1: Directorio del proyecto no existe o no es accesible**
+```bash
+# Verificar que el contenedor tiene el código montado correctamente
+docker-compose exec airflow ls -la /app
+
+# Verificar que pyproject.toml existe (necesario para que Kedro reconozca el proyecto)
+docker-compose exec airflow test -f /app/pyproject.toml && echo "pyproject.toml existe" || echo "pyproject.toml NO existe"
+
+# Verificar estructura del proyecto
+docker-compose exec airflow ls -la /app/src
+docker-compose exec airflow ls -la /app/conf
+
+# Verificar que el volumen se montó correctamente desde el host
+docker-compose exec airflow pwd
+```
+
+**Causa 2: Kedro no está instalado o no funciona**
+```bash
+# Verificar instalación de Kedro dentro del contenedor
+docker-compose exec airflow python -m kedro --version
+
+# Verificar que Kedro reconoce el proyecto
+docker-compose exec airflow bash -c "cd /app && python -m kedro info"
+
+# Si falla "Kedro project not found", verificar que todos los archivos están presentes
+docker-compose exec airflow bash -c "cd /app && ls -la pyproject.toml conf/base src/"
+
+# Si falla, reinstalar dependencias
+docker-compose exec airflow pip install -r /app/requirements.txt
+```
+
+**Nota importante**: El proyecto debe estar completo en el host para que el volumen funcione. Asegúrate de que tienes:
+- `pyproject.toml` en la raíz
+- `conf/` con subdirectorios `base/` y `local/`
+- `src/proyecto_ml_clashroyale/` con el código
+- `requirements.txt`
+
+**Causa 3: Datos faltantes o archivos intermedios no generados**
+
+Este error ocurre cuando un pipeline intenta leer archivos que deberían haberse generado por otro pipeline anterior.
+
+```bash
+# Verificar que los datos de entrada existen
+docker-compose exec airflow ls -la /app/data/01_raw/
+
+# Verificar que los archivos intermedios existen (si son necesarios)
+docker-compose exec airflow ls -la /app/data/02_intermediate/
+
+# Si faltan archivos intermedios, ejecutar los pipelines en orden:
+# 1. business_understanding (genera Combates*_cleaned.csv)
+# 2. data_preparation (necesita Combates*_cleaned.csv)
+# 3. feature_engineering
+# 4. classification / regression
+```
+
+**Error específico: `DatasetError: Failed while loading data from dataset`**
+
+Si ves este error mencionando archivos como `Combates1_cleaned.csv`, significa que:
+- El pipeline `business_understanding` debe ejecutarse primero para generar estos archivos
+- El DAG `clashroyale_ml_with_datacleaning` ahora incluye `business_understanding` automáticamente
+- Si usas un DAG que solo ejecuta `data_preparation`, asegúrate de que los archivos `Combates*_cleaned.csv` ya existen en `data/02_intermediate/`
+
+**Causa 4: Permisos incorrectos**
+```bash
+# Verificar permisos del directorio
+docker-compose exec airflow ls -la /app
+
+# Ajustar permisos si es necesario (dentro del contenedor)
+docker-compose exec airflow chown -R airflow:airflow /app
+```
+
+**Solución general: Ver logs detallados**
+1. En la interfaz de Airflow, haz clic en la tarea que falló
+2. Haz clic en "Log" para ver el error completo
+3. Revisa los mensajes de error específicos (ej: "No such file", "command not found", etc.)
+
+**Solución: Reconstruir y verificar**
+```bash
+# 1. VERIFICAR que estás en el directorio correcto del proyecto
+pwd  # Debe ser la raíz del proyecto
+ls -la pyproject.toml requirements.txt src/ conf/  # Deben existir
+
+# 2. Si el proyecto está incompleto, clonarlo o descargarlo completo
+# Asegúrate de tener TODOS los archivos del proyecto en el host
+
+# 3. Limpiar todo
+docker-compose down -v
+
+# 4. Reconstruir imagen
+docker-compose build --no-cache
+
+# 5. Iniciar y verificar
+docker-compose up -d
+
+# 6. Verificar que el proyecto está montado correctamente
+docker-compose exec airflow ls -la /app/pyproject.toml
+docker-compose exec airflow bash -c "cd /app && python -m kedro info"
+```
+
+**Si sigue fallando: Verificar el montaje del volumen**
+```bash
+# Verificar desde dónde se está montando el volumen
+docker-compose config | grep -A 5 volumes
+
+# Verificar que el directorio en el host tiene todos los archivos
+ls -la | grep -E "pyproject.toml|requirements.txt|src|conf|Dockerfile"
+
+# Si faltan archivos, el problema es que el proyecto no está completo en el host
+```
+
+**Otros errores comunes**
+- **Error de permisos**: Verificar que `docker-entrypoint.sh` tiene permisos de ejecución
+- **Error "command not found"**: Verificar que el archivo se copió correctamente en el Dockerfile
+- **Error de construcción**: Limpiar cache: `docker system prune -a` y reconstruir
+
+#### DAGs disponibles en Docker
+
+Ver sección **"📋 DAGs de Airflow"** más abajo para detalles completos.
+
+**Nota importante**: La base de datos de Airflow se limpia y se recrea automáticamente cada vez que inicias el contenedor. El usuario `admin` con contraseña `admin` se crea automáticamente en cada inicio.
+
+**📖 Guía completa:** Ver [`DOCKER_GUIDE.md`](DOCKER_GUIDE.md) para instrucciones detalladas paso a paso y solución de problemas.
+
+---
+
+### Opción 2: Kedro (Local - Sin Docker) 🔧
+
+**Ventajas**: Mayor control del entorno, ejecución directa, útil para desarrollo.
+
+#### Prerrequisitos
+- Python 3.8 o superior
+- Entorno virtual creado
+- Dependencias instaladas (ver sección "Instalación Rápida")
+
+#### Ejecutar pipelines completos
+
+**Pipeline completo (todos los pipelines)**
 ```bash
 kedro run
 ```
 
-### Ejecutar Pipelines Específicos
-
-#### Fase 1: Comprensión del Negocio
+**Pipelines de análisis (CRISP-DM)**
 ```bash
+# Fase 1: Comprensión del Negocio
 kedro run --pipeline=business_understanding
-```
 
-#### Fase 2: Análisis Exploratorio de Datos (EDA)
-```bash
+# Fase 2: Análisis Exploratorio de Datos (EDA)
 kedro run --pipeline=eda
-```
 
-#### Fase 3: Preparación de Datos
-```bash
+# Fase 3: Preparación de Datos
 kedro run --pipeline=data_preparation
 ```
 
-### Visualizar Pipeline (Opcional)
-
+**Pipelines de Machine Learning**
 ```bash
-kedro viz
+# Feature Engineering (requerido antes de ML)
+kedro run --pipeline=feature_engineering
+
+# Pipeline de Clasificación (entrena 5 modelos)
+kedro run --pipeline=classification
+
+# Pipeline de Regresión (entrena 6 modelos)
+kedro run --pipeline=regression
 ```
 
-Abre tu navegador en `http://127.0.0.1:4141` para ver la visualización interactiva.
+#### Ejecutar modelos individuales por tags
 
-### Trabajar con Jupyter Notebooks
-
+**Clasificación** (5 modelos disponibles)
 ```bash
-kedro jupyter notebook
-```
-
-O con JupyterLab:
-
-```bash
-kedro jupyter lab
-```
-
-## 🧩 Pipelines ML añadidos
-
-- feature_engineering: re-etiquetado 50/50, multi-hot de 102 cartas (cards_diff), features agregadas (Δtrophies, rarezas).
-- classification: 5 modelos (LogReg, RF, XGBoost, LinearSVC, LightGBM) con GridSearchCV; métricas por modelo y comparación JSON.
-- regression: 6 modelos (Linear, Ridge, RF, XGBoost, LinearSVR, LightGBM) con GridSearchCV; métricas por modelo y comparación JSON.
-
-Salidas:
-- Modelos: `data/06_models/{classification|regression}/*.pkl`
-- Métricas por modelo: `data/07_model_output/*_metrics.json`
-- Comparaciones: `data/08_reporting/{classification|regression}_comparison.json`
-
-### Ejecutar por tags (modelos individuales)
-```bash
-# Clasificación
 kedro run --pipeline=classification --tags logistic
 kedro run --pipeline=classification --tags random_forest
 kedro run --pipeline=classification --tags xgboost
 kedro run --pipeline=classification --tags svc
 kedro run --pipeline=classification --tags lightgbm
+```
 
-# Regresión
+**Regresión** (6 modelos disponibles)
+```bash
 kedro run --pipeline=regression --tags linear
 kedro run --pipeline=regression --tags ridge
 kedro run --pipeline=regression --tags random_forest
@@ -199,175 +463,256 @@ kedro run --pipeline=regression --tags svr
 kedro run --pipeline=regression --tags lightgbm
 ```
 
+#### Herramientas adicionales de Kedro
+
+**Visualizar pipeline**
+```bash
+kedro viz
+```
+Abre `http://127.0.0.1:4141` para ver la visualización interactiva del pipeline.
+
+**Jupyter Notebooks**
+```bash
+# Jupyter Notebook
+kedro jupyter notebook
+
+# JupyterLab
+kedro jupyter lab
+```
+
+---
+
+## 🧩 Pipelines ML Disponibles
+
+### Feature Engineering (`feature_engineering`)
+- **Objetivo**: Preparar datos para modelado ML
+- **Tareas**:
+  - Re-etiquetado balanceado (50% A=winner, 50% A=loser)
+  - Multi-hot encoding de cartas (102 IDs)
+  - Features agregadas (Δtrophies, conteos de rareza)
+  - División train/test
+- **Salidas**:
+  - `data/04_feature/balanced_dataset.csv`
+  - `data/04_feature/features_combined.csv`
+  - `data/05_model_input/train_data.csv`, `test_data.csv`
+
+### Clasificación (`classification`)
+- **Objetivo**: Predecir si el jugador A gana (binario 1/0)
+- **Modelos**: 5 modelos con GridSearchCV (k=3 folds)
+  1. **Logistic Regression**: Modelo lineal básico
+  2. **Random Forest**: Ensemble con árboles
+  3. **XGBoost**: Gradient boosting optimizado
+  4. **LinearSVC**: Support Vector Classifier lineal
+  5. **LightGBM**: Gradient boosting rápido
+- **Métricas**: Accuracy, Precision, Recall, F1-Score, ROC-AUC
+- **Salidas**:
+  - Modelos: `data/06_models/classification/*.pkl`
+  - Métricas: `data/07_model_output/*_metrics.json`
+  - Comparación: `data/08_reporting/classification_comparison.json`
+
+### Regresión (`regression`)
+- **Objetivo**: Predecir el cambio de trofeos de A (A.trophyChange, con signo)
+- **Modelos**: 6 modelos con GridSearchCV (k=3 folds)
+  1. **Linear Regression**: Modelo lineal básico
+  2. **Ridge**: Regresión con regularización L2
+  3. **Random Forest**: Ensemble con árboles
+  4. **XGBoost**: Gradient boosting optimizado
+  5. **LinearSVR**: Support Vector Regressor lineal
+  6. **LightGBM**: Gradient boosting rápido
+- **Métricas**: MAE, MSE, RMSE, R²
+- **Salidas**:
+  - Modelos: `data/06_models/regression/*.pkl`
+  - Métricas: `data/07_model_output/*_metrics.json`
+  - Comparación: `data/08_reporting/regression_comparison.json`
+
+---
+
+## 📋 DAGs de Airflow
+
+El proyecto incluye 5 DAGs configurados para ejecutar los pipelines de Kedro:
+
+### 1. `clashroyale_ml_with_datacleaning` (Completo)
+- **Descripción**: Pipeline ML completo desde la limpieza de datos hasta el entrenamiento
+- **Tareas**:
+  1. `business_understanding` → Limpieza inicial de datos y comprensión del negocio (genera `Combates*_cleaned.csv`)
+  2. `data_cleaning` → Preparación de datos y combinación de datasets
+  3. `feature_engineering` → Ingeniería de features
+  4. `classification_pipeline` → Entrenamiento de modelos de clasificación
+  5. `regression_pipeline` → Entrenamiento de modelos de regresión
+- **Flujo**: `business_understanding → data_cleaning → feature_engineering → [classification, regression]`
+- **Uso**: Ejecutar el pipeline completo desde cero (requiere datos en `data/01_raw/`)
+
+### 2. `clashroyale_ml_no_datacleaning` (Sin data cleaning)
+- **Descripción**: Pipeline ML sin la etapa de limpieza de datos (asume datos ya limpios)
+- **Tareas**:
+  1. `feature_engineering` → Ingeniería de features
+  2. `classification_pipeline` → Entrenamiento de modelos de clasificación
+  3. `regression_pipeline` → Entrenamiento de modelos de regresión
+- **Flujo**: `feature_engineering → [classification, regression]`
+- **Uso**: Cuando los datos ya están limpios y solo necesitas re-entrenar modelos
+
+### 3. `classification_ml_pipeline` (Solo clasificación)
+- **Descripción**: Pipeline completo para entrenar modelos de clasificación
+- **Tareas**:
+  1. `feature_engineering` → Ingeniería de features
+  2. `classification_pipeline` → Entrenamiento de 5 modelos de clasificación
+- **Flujo**: `feature_engineering → classification`
+- **Uso**: Cuando solo necesitas entrenar modelos de clasificación
+
+### 4. `regression_ml_pipeline` (Solo regresión)
+- **Descripción**: Pipeline completo para entrenar modelos de regresión
+- **Tareas**:
+  1. `feature_engineering` → Ingeniería de features
+  2. `regression_pipeline` → Entrenamiento de 6 modelos de regresión
+- **Flujo**: `feature_engineering → regression`
+- **Uso**: Cuando solo necesitas entrenar modelos de regresión
+
+### 5. `data_cleaning_only` (Solo limpieza)
+- **Descripción**: Solo ejecuta la limpieza y preparación de datos
+- **Tareas**:
+  1. `data_cleaning` → Limpieza y preparación de datos
+- **Flujo**: Solo `data_cleaning`
+- **Uso**: Cuando solo necesitas limpiar los datos sin entrenar modelos
+
+### Ejecutar DAGs desde Airflow
+
+1. Accede a http://localhost:8080
+2. Inicia sesión con `admin` / `admin`
+3. En la lista de DAGs, selecciona el DAG deseado
+4. Haz clic en "Trigger DAG" para ejecutarlo manualmente
+5. Monitorea el progreso en la vista de árbol o gráfico
+6. Revisa los logs de cada tarea si es necesario
+
+### Configuración de DAGs
+
+- **Owner**: `clashroyale_ml`
+- **Retries**: 1 intento
+- **Retry delay**: 5 minutos
+- **Rutas**: 
+  - En Docker: `/app` (contenedor)
+  - En WSL: `/mnt/c/Users/Usuario/Documents/GitHub/ML_ClashRoyale` (WSL)
+
 ## 🛠️ Parámetros clave (conf/base/parameters.yml)
 
-- feature_engineering.max_samples_per_class: tamaño por clase (p.ej. 50,000 → 100K total).
-- classification.cv_folds / regression.cv_folds: folds de GridSearchCV (p.ej. 3).
-- Grids reducidos para menor consumo de recursos.
+### Feature Engineering
+- `feature_engineering.max_samples_per_class`: Tamaño por clase para balanceo (p.ej. 50,000 → 100K total)
+  - Reduce memoria y tiempo de ejecución
+  - Ajustable según recursos disponibles
 
-## 🪪 Airflow – Orquestación
+### Clasificación
+- `classification.cv_folds`: Folds de cross-validation para GridSearchCV (p.ej. 3)
+- `classification.scoring`: Métricas para evaluación
+- `classification.random_state`: Semilla para reproducibilidad
+- `classification.param_grid`: Grid de hiperparámetros por modelo (reducido para eficiencia)
 
-### Opción 1: Docker (Recomendado para Windows)
+### Regresión
+- `regression.cv_folds`: Folds de cross-validation para GridSearchCV (p.ej. 3)
+- `regression.scoring`: Métricas para evaluación
+- `regression.random_state`: Semilla para reproducibilidad
+- `regression.param_grid`: Grid de hiperparámetros por modelo (reducido para eficiencia)
 
-Docker permite ejecutar Airflow sin necesidad de WSL, con todas las dependencias preconfiguradas. **Solo incluye código + dependencias** (~1-2 GB), los datos se montan como volumen.
-
-#### 📋 Prerrequisitos
-1. **Docker Desktop** instalado y ejecutándose en Windows
-2. **Docker Compose** (incluido en Docker Desktop)
-
-#### 🚀 Pasos rápidos (resumen)
-
-```bash
-# 1. Verificar Docker
-docker --version
-
-# 2. Navegar al proyecto
-cd C:\Users\Usuario\Documents\GitHub\ML_ClashRoyale
-
-# 3. Construir imagen (solo código + dependencias, ~1-2 GB)
-docker-compose build
-
-# 4. Iniciar Airflow
-docker-compose up -d
-
-# 5. Ver logs (opcional)
-docker-compose logs -f airflow
-
-# 6. Acceder a http://localhost:8080
-# Usuario: admin | Contraseña: admin
-```
-
-⏱️ **Tiempo estimado:** 5-15 minutos (primera vez)  
-📦 **Tamaño imagen:** ~1-2 GB (datos se montan como volumen, no se incluyen)
-
-**📖 Guía completa paso a paso:** Ver [`DOCKER_GUIDE.md`](DOCKER_GUIDE.md) para instrucciones detalladas y solución de problemas.
-
-#### 🛑 Detener Airflow
-```bash
-# Detener (mantiene volúmenes)
-docker-compose down
-
-# Detener y eliminar volúmenes (reset completo de BD)
-docker-compose down -v
-```
-
-#### 🔄 Reiniciar Airflow
-```bash
-# Si ya construiste la imagen antes
-docker-compose up -d
-
-# Si necesitas reconstruir (después de cambios en Dockerfile)
-docker-compose build --no-cache
-docker-compose up -d
-```
-
-#### DAGs disponibles en Docker
-Todos los DAGs están configurados para usar rutas del contenedor (`/app`):
-- `clashroyale_ml_with_datacleaning` (completo: data_preparation → feature_engineering → [classification, regression])
-- `clashroyale_ml_no_datacleaning` (sin data_preparation: feature_engineering → [classification, regression])
-- `classification_ml_pipeline` (feature_engineering → classification)
-- `regression_ml_pipeline` (feature_engineering → regression)
-- `data_cleaning_only` (solo data_preparation)
-
-#### Volúmenes y persistencia
-- **Código del proyecto**: montado desde `./` (cambios en código se reflejan sin rebuild)
-- **DAGs**: montados desde `./airflow/dags` (cambios en DAGs sin rebuild)
-- **Base de datos**: se limpia automáticamente en cada inicio (se recrea desde cero)
-- **Logs**: persistidos en volumen `airflow-logs`
-- **Datos**: montados desde `./data` (opcional, para usar datos del host)
-
-**Nota importante**: La base de datos de Airflow se limpia y se recrea automáticamente cada vez que inicias el contenedor. Esto garantiza un estado limpio en cada ejecución.
-
-#### Solución de problemas
-```bash
-# Reconstruir imagen desde cero
-docker-compose build --no-cache
-
-# Ejecutar comandos dentro del contenedor
-docker-compose exec airflow bash
-
-# Verificar que Airflow está corriendo
-docker-compose ps
-
-# Limpiar todo (imágenes, contenedores, volúmenes)
-docker-compose down -v --rmi all
-```
-
-### Opción 2: WSL (Alternativa local)
-
-Si prefieres ejecutar Airflow directamente en WSL sin Docker:
-
-1) Preparar entorno
-```bash
-cd /mnt/c/Users/Usuario/Documents/GitHub/ML_ClashRoyale
-python3 -m venv venv
-source venv/bin/activate
-pip install --upgrade pip
-export AIRFLOW_HOME=/mnt/c/Users/Usuario/Documents/GitHub/ML_ClashRoyale/airflow
-AIRFLOW_VERSION=3.1.0
-CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-3.11.txt"
-pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}"
-pip install -r requirements.txt
-```
-
-2) Iniciar
-```bash
-export AIRFLOW__CORE__LOAD_EXAMPLES=False
-airflow standalone
-# UI: http://localhost:8080 (credenciales en airflow/simple_auth_manager_passwords.json.generated)
-```
-
-**Nota**: En WSL, los DAGs usan rutas WSL (`/mnt/c/...`). En Docker, usan rutas del contenedor (`/app`).
+**Nota**: Los grids de hiperparámetros están reducidos para un uso eficiente de recursos. Ajusta según tus necesidades.
 
 
 ## 🎯 Objetivos de Modelado
 
-### Clasificación (binaria)
-- Objetivo: predecir si el jugador A gana o pierde.
-- Label: 1 (A gana), 0 (A pierde).
-- Métricas: Accuracy, Precision, Recall, F1-Score, ROC-AUC.
+### Clasificación (Binaria)
+- **Variable objetivo**: Predecir si el jugador A gana o pierde la batalla
+- **Label**: 
+  - `1` = A gana
+  - `0` = A pierde
+- **Métricas evaluadas**: 
+  - Accuracy (Precisión global)
+  - Precision (Precisión por clase)
+  - Recall (Sensibilidad)
+  - F1-Score (Media armónica)
+  - ROC-AUC (Área bajo la curva ROC)
+- **Modelos**: 5 modelos con GridSearchCV + Cross-Validation (k≥3)
 
 ### Regresión
-- Objetivo: predecir el cambio de trofeos de A (A.trophyChange, con signo).
-- Métricas: MAE, MSE, RMSE, R².
+- **Variable objetivo**: Predecir el cambio de trofeos del jugador A (A.trophyChange, con signo)
+  - Valores positivos = A gana trofeos
+  - Valores negativos = A pierde trofeos
+- **Re-etiquetado**: 
+  - 50% A=winner → `y_reg = winner.trophyChange`
+  - 50% A=loser → `y_reg = loser.trophyChange`
+- **Métricas evaluadas**: 
+  - MAE (Error Absoluto Medio)
+  - MSE (Error Cuadrático Medio)
+  - RMSE (Raíz del Error Cuadrático Medio)
+  - R² (Coeficiente de Determinación)
+- **Modelos**: 6 modelos con GridSearchCV + Cross-Validation (k≥3)
 
-## ⚙️ Configuración resumida
-
-### Parámetros (conf/base/parameters.yml)
-- `feature_engineering.max_samples_per_class`: tamaño por clase (p. ej. 50_000 → 100K total).
-- `classification.cv_folds` / `regression.cv_folds`: folds de CV (p. ej. 3).
-- Grids de hiperparámetros reducidos para uso eficiente de recursos.
+## ⚙️ Configuración Detallada
 
 ### Catálogo (conf/base/catalog.yml)
-- Modelos guardados en `data/06_models/{classification|regression}/*.pkl`.
-- Métricas por modelo en `data/07_model_output/*.json`.
-- Comparaciones en `data/08_reporting/{classification|regression}_comparison.json`.
+- **Modelos entrenados**: `data/06_models/{classification|regression}/*.pkl`
+- **Métricas individuales**: `data/07_model_output/*_metrics.json`
+- **Comparaciones**: `data/08_reporting/{classification|regression}_comparison.json`
+- **Features**: `data/04_feature/*.csv`, `data/05_model_input/{train|test}_data.csv`
 
-### Requisitos
-- `requirements.txt` incluye Airflow 3.1 (instalar con constraints en WSL), Kedro, scikit-learn, xgboost, lightgbm, DVC.
+### Estructura de Features
 
-## 🔄 DVC (versionado de datos y artefactos)
+**Multi-hot encoding de cartas**:
+- Diccionario de 102 cartas (`card_index`)
+- Vectores de presencia para A y B
+- Feature principal: `cards_diff = vec_A - vec_B`
 
-Inicialización (si aún no se hizo):
+**Features agregadas**:
+- `Δtrophies = A.startingTrophies - B.startingTrophies`
+- Conteos de rareza (common/rare/epic/legendary) para A y B
+- Variables adicionales según necesidades
+
+**Nota importante**: `winner.trophyChange` y `loser.trophyChange` NO se usan como features, solo como target en regresión.
+
+### Requisitos del Sistema
+- **RAM**: 8GB mínimo (16GB recomendado para datasets completos)
+- **Almacenamiento**: 2GB libres
+- **CPU**: Multi-core recomendado
+- **Docker** (opcional): Docker Desktop para ejecución con contenedores
+
+## 🔄 DVC (Versionado de Datos y Artefactos)
+
+El proyecto incluye DVC para versionar datasets, features, modelos y métricas.
+
+### Inicialización (si aún no se hizo)
 ```bash
 dvc init
 git add .dvc .dvcignore
 git commit -m "chore(dvc): init"
 ```
 
-Ejecución orquestada y métricas:
+### Ejecución orquestada
 ```bash
-# Ejecutar stages definidos
+# Ejecutar stages definidos en dvc.yaml
 dvc repro
 
+# Ejecutar un stage específico
+dvc repro feature_engineering
+dvc repro classification
+dvc repro regression
+```
+
+### Métricas y comparación
+```bash
 # Ver métricas actuales
 dvc metrics show
 
 # Comparar métricas entre commits
 dvc metrics diff
+
+# Ver diferencias visualmente
+dvc metrics diff --show-json
 ```
 
-Sugerencia: versionar `data/06_models/` y métricas si deseas comparar experimentos con commits.
+### Versionado de artefactos
+Los siguientes directorios pueden versionarse con DVC:
+- `data/04_feature/`: Features generadas
+- `data/06_models/`: Modelos entrenados
+- `data/07_model_output/`: Métricas de modelos
+- `data/08_reporting/`: Comparaciones y reportes
+
+**Sugerencia**: Versionar modelos y métricas permite comparar experimentos entre commits.
 
 ## 📊 Resultados del Análisis
 

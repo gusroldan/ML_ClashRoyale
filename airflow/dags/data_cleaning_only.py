@@ -25,7 +25,19 @@ PROJECT_ROOT = "/app"
 
 data_cleaning = BashOperator(
     task_id='data_cleaning',
-    bash_command=f'cd {PROJECT_ROOT} && set -e && python -m kedro run --pipeline=data_preparation',
+    bash_command=f'''
+        set -e
+        cd {PROJECT_ROOT} || {{ echo "Error: No se pudo cambiar a {PROJECT_ROOT}"; exit 1; }}
+        echo "Directorio actual: $(pwd)"
+        echo "Verificando que pyproject.toml existe..."
+        test -f pyproject.toml || {{ echo "Error: pyproject.toml no encontrado en {PROJECT_ROOT}"; ls -la; exit 1; }}
+        echo "Verificando instalación de Kedro..."
+        python -m kedro --version || {{ echo "Error: Kedro no está instalado"; exit 1; }}
+        echo "Verificando que es un proyecto Kedro..."
+        python -m kedro info || {{ echo "Error: No es un proyecto Kedro válido"; exit 1; }}
+        echo "Ejecutando pipeline: data_preparation"
+        python -m kedro run --pipeline=data_preparation
+    ''',
     dag=dag,
 )
 
