@@ -293,6 +293,27 @@ clustering_comparison:
   type: kedro_datasets.json.JSONDataset
   filepath: data/08_reporting/clustering_comparison.json
 
+# Model Outputs - Dimensionality Reduction
+pca_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/dimensionality_reduction/pca_model.pkl
+
+pca_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/pca_metrics.json
+
+umap_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/dimensionality_reduction/umap_model.pkl
+
+umap_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/umap_metrics.json
+
+dimensionality_reduction_comparison:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/08_reporting/dimensionality_reduction_comparison.json
+
 final_report:
   type: kedro_datasets.text.TextDataSet
   filepath: data/08_reporting/final_report.md

@@ -10,7 +10,8 @@ from .pipelines import (
     create_feature_engineering_pipeline,
     create_classification_pipeline,
     create_regression_pipeline,
-    create_unsupervised_learning_pipeline
+    create_unsupervised_learning_pipeline,
+    create_dimensionality_reduction_pipeline
 )
 
 
@@ -42,6 +43,9 @@ def register_pipelines() -> dict[str, Pipeline]:
     
     # Pipeline específico para clustering (aprendizaje no supervisado)
     pipelines["unsupervised_learning"] = create_unsupervised_learning_pipeline()
+    
+    # Pipeline específico para reducción de dimensionalidad
+    pipelines["dimensionality_reduction"] = create_dimensionality_reduction_pipeline()
     
     # Pipeline por defecto incluye todos los pipelines
     pipelines["__default__"] = sum(pipelines.values())

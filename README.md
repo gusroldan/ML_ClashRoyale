@@ -542,11 +542,29 @@ kedro jupyter lab
   - Métricas: `data/07_model_output/kmeans_metrics.json`, `optics_metrics.json`, `hierarchical_metrics.json`
   - Comparación: `data/08_reporting/clustering_comparison.json`
 
+### Reducción de Dimensionalidad (`dimensionality_reduction`)
+- **Objetivo**: Reducir la dimensionalidad de los datos manteniendo la información más importante
+- **Modelos**: 2 métodos de reducción de dimensionalidad
+  1. **PCA (Análisis de Componentes Principales)**: Transformación lineal basada en varianza
+     - Varianza explicada (por componente y acumulada)
+     - Loadings (componentes principales)
+     - Biplot data (para visualización)
+  2. **UMAP (Uniform Manifold Approximation and Projection)**: Reducción no lineal basada en variedades
+     - Preserva estructura local y global
+     - Alternativa moderna a t-SNE
+- **Métricas**:
+  - PCA: Varianza explicada total y por componente
+  - UMAP: Parámetros de configuración (n_neighbors, min_dist, metric)
+- **Salidas**:
+  - Modelos: `data/06_models/dimensionality_reduction/pca_model.pkl`, `umap_model.pkl`
+  - Métricas: `data/07_model_output/pca_metrics.json`, `umap_metrics.json`
+  - Comparación: `data/08_reporting/dimensionality_reduction_comparison.json`
+
 ---
 
 ## 📋 DAGs de Airflow
 
-El proyecto incluye 6 DAGs configurados para ejecutar los pipelines de Kedro:
+El proyecto incluye 7 DAGs configurados para ejecutar los pipelines de Kedro:
 
 ### 1. `clashroyale_ml_with_datacleaning` (Completo)
 - **Descripción**: Pipeline ML completo desde la limpieza de datos hasta el entrenamiento
@@ -557,7 +575,8 @@ El proyecto incluye 6 DAGs configurados para ejecutar los pipelines de Kedro:
   4. `classification_pipeline` → Entrenamiento de modelos de clasificación
   5. `regression_pipeline` → Entrenamiento de modelos de regresión
   6. `clustering_pipeline` → Entrenamiento de modelos de clustering (aprendizaje no supervisado)
-- **Flujo**: `business_understanding → data_cleaning → feature_engineering → [classification, regression, clustering]`
+  7. `dimensionality_reduction_pipeline` → Reducción de dimensionalidad (PCA y UMAP)
+- **Flujo**: `business_understanding → data_cleaning → feature_engineering → [classification, regression, clustering, dimensionality_reduction]`
 - **Uso**: Ejecutar el pipeline completo desde cero (requiere datos en `data/01_raw/`)
 
 ### 2. `clashroyale_ml_no_datacleaning` (Sin data cleaning)
@@ -567,7 +586,8 @@ El proyecto incluye 6 DAGs configurados para ejecutar los pipelines de Kedro:
   2. `classification_pipeline` → Entrenamiento de modelos de clasificación
   3. `regression_pipeline` → Entrenamiento de modelos de regresión
   4. `clustering_pipeline` → Entrenamiento de modelos de clustering (aprendizaje no supervisado)
-- **Flujo**: `feature_engineering → [classification, regression, clustering]`
+  5. `dimensionality_reduction_pipeline` → Reducción de dimensionalidad (PCA y UMAP)
+- **Flujo**: `feature_engineering → [classification, regression, clustering, dimensionality_reduction]`
 - **Uso**: Cuando los datos ya están limpios y solo necesitas re-entrenar modelos
 
 ### 3. `classification_ml_pipeline` (Solo clasificación)
@@ -594,7 +614,15 @@ El proyecto incluye 6 DAGs configurados para ejecutar los pipelines de Kedro:
 - **Flujo**: `feature_engineering → clustering`
 - **Uso**: Cuando solo necesitas entrenar modelos de clustering
 
-### 6. `data_cleaning_only` (Solo limpieza)
+### 6. `dimensionality_reduction_ml_pipeline` (Solo reducción de dimensionalidad)
+- **Descripción**: Pipeline completo para reducción de dimensionalidad (PCA y UMAP)
+- **Tareas**:
+  1. `feature_engineering` → Ingeniería de features
+  2. `dimensionality_reduction_pipeline` → Aplicación de PCA y UMAP
+- **Flujo**: `feature_engineering → dimensionality_reduction`
+- **Uso**: Cuando solo necesitas reducir la dimensionalidad de los datos
+
+### 7. `data_cleaning_only` (Solo limpieza)
 - **Descripción**: Solo ejecuta la limpieza y preparación de datos
 - **Tareas**:
   1. `data_cleaning` → Limpieza y preparación de datos

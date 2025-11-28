@@ -81,6 +81,22 @@ clustering = BashOperator(
     dag=dag,
 )
 
-feature_engineering >> [classification, regression, clustering]
+dimensionality_reduction = BashOperator(
+    task_id='dimensionality_reduction_pipeline',
+    bash_command=f'''
+        set -e
+        cd {PROJECT_ROOT} || {{ echo "Error: No se pudo cambiar a {PROJECT_ROOT}"; exit 1; }}
+        echo "Directorio actual: $(pwd)"
+        echo "Verificando que pyproject.toml existe..."
+        test -f pyproject.toml || {{ echo "Error: pyproject.toml no encontrado"; exit 1; }}
+        echo "Verificando que train_data existe..."
+        test -f data/05_model_input/train_data.csv || {{ echo "Error: train_data.csv no encontrado"; exit 1; }}
+        echo "Ejecutando pipeline: dimensionality_reduction"
+        python -m kedro run --pipeline=dimensionality_reduction
+    ''',
+    dag=dag,
+)
+
+feature_engineering >> [classification, regression, clustering, dimensionality_reduction]
 
 

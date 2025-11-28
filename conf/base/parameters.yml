@@ -95,3 +95,17 @@ unsupervised_learning:
       metric: 'euclidean'  # Métrica de distancia (solo si linkage != 'ward')
       calculate_dendrogram: true  # Calcular datos del dendrograma
       max_samples_dendrogram: 5000  # Máximo de muestras para calcular dendrograma (por rendimiento)
+
+# Dimensionality Reduction parameters
+dimensionality_reduction:
+  random_state: 42
+  models:
+    pca:
+      n_components: null  # null = usar variance_threshold, int = número fijo, float = fracción de varianza
+      variance_threshold: 0.95  # Usar componentes suficientes para explicar 95% de varianza
+      n_top_features_per_component: 5  # Número de features top a guardar por componente
+    umap:
+      n_components: 2  # Número de dimensiones de salida (típicamente 2 o 3 para visualización)
+      n_neighbors: 15  # Número de vecinos para construir el grafo (valores típicos: 5-50)
+      min_dist: 0.1  # Distancia mínima entre puntos en el espacio de salida (0.0-1.0)
+      metric: 'euclidean'  # Métrica de distancia ('euclidean', 'manhattan', 'cosine', etc.)
