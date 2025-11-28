@@ -314,6 +314,64 @@ dimensionality_reduction_comparison:
   type: kedro_datasets.json.JSONDataset
   filepath: data/08_reporting/dimensionality_reduction_comparison.json
 
+# Model Outputs - Anomaly Detection
+isolation_forest_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/anomaly_detection/isolation_forest_model.pkl
+
+isolation_forest_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/isolation_forest_metrics.json
+
+lof_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/anomaly_detection/lof_model.pkl
+
+lof_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/lof_metrics.json
+
+oneclass_svm_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/anomaly_detection/oneclass_svm_model.pkl
+
+oneclass_svm_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/oneclass_svm_metrics.json
+
+autoencoder_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/anomaly_detection/autoencoder_model.pkl
+
+autoencoder_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/autoencoder_metrics.json
+
+anomaly_detection_comparison:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/08_reporting/anomaly_detection_comparison.json
+
+# Model Outputs - Association Rules
+apriori_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/association_rules/apriori_model.pkl
+
+apriori_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/apriori_metrics.json
+
+fpgrowth_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/association_rules/fpgrowth_model.pkl
+
+fpgrowth_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/fpgrowth_metrics.json
+
+association_rules_comparison:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/08_reporting/association_rules_comparison.json
+
 final_report:
   type: kedro_datasets.text.TextDataSet
   filepath: data/08_reporting/final_report.md

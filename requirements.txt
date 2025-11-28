@@ -3,12 +3,12 @@ pandas>=1.3.0
 numpy>=1.21.0
 
 # Visualization
-matplotlib>=3.4.0
-seaborn>=0.11.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
 plotly>=5.0.0
 
 # Machine Learning
-scikit-learn>=1.0.0
+scikit-learn>=1.3.0
 
 # Kedro ecosystem
 kedro>=0.18.0
@@ -40,3 +40,19 @@ apache-airflow==3.1.0
 
 # Utilidades
 imbalanced-learn>=0.10.0
+
+# Reglas de asociación
+mlxtend>=0.22.0
+
+# Detección de anomalías
+pyod>=1.1.0  # Biblioteca especializada para detección de anomalías
+
+# Clustering avanzado
+hdbscan>=0.8.0  # Clustering jerárquico basado en densidad
+
+# Interpretabilidad
+shap>=0.42.0  # SHAP values para interpretabilidad de modelos
+
+# Detección de anomalías con autoencoders (opcional)
+# Descomentar si quieres usar autoencoders:
+# tensorflow>=2.10.0

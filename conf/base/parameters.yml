@@ -109,3 +109,42 @@ dimensionality_reduction:
       n_neighbors: 15  # Número de vecinos para construir el grafo (valores típicos: 5-50)
       min_dist: 0.1  # Distancia mínima entre puntos en el espacio de salida (0.0-1.0)
       metric: 'euclidean'  # Métrica de distancia ('euclidean', 'manhattan', 'cosine', etc.)
+
+# Anomaly Detection parameters
+anomaly_detection:
+  random_state: 42
+  models:
+    isolation_forest:
+      contamination: 0.1  # Proporción esperada de anomalías (0.0-0.5)
+      n_estimators: 100  # Número de árboles en el ensemble
+      max_samples: 'auto'  # Número de muestras para entrenar cada árbol ('auto' = min(256, n_samples))
+    lof:
+      n_neighbors: 20  # Número de vecinos para calcular el factor de outlier local
+      contamination: 0.1  # Proporción esperada de anomalías (0.0-0.5)
+      metric: 'euclidean'  # Métrica de distancia ('euclidean', 'manhattan', etc.)
+    oneclass_svm:
+      nu: 0.1  # Proporción esperada de anomalías (0.0-1.0)
+      kernel: 'rbf'  # Tipo de kernel ('rbf', 'linear', 'poly', 'sigmoid')
+      gamma: 'scale'  # Coeficiente del kernel ('scale', 'auto', o valor numérico)
+    autoencoder:
+      encoding_dim: 32  # Dimensión de la capa de codificación (bottleneck)
+      hidden_layers: [64, 32]  # Capas ocultas del encoder/decoder
+      epochs: 50  # Número de épocas de entrenamiento
+      batch_size: 32  # Tamaño del batch
+      threshold_percentile: 95  # Percentil para determinar el umbral de anomalía
+
+# Association Rules parameters
+association_rules:
+  models:
+    apriori:
+      min_support: 0.1  # Soporte mínimo para itemsets frecuentes (0.0-1.0)
+      min_confidence: 0.5  # Confianza mínima para reglas (0.0-1.0)
+      min_lift: 1.0  # Lift mínimo para reglas (valores > 1.0 indican asociación positiva)
+      max_len: null  # Longitud máxima de itemsets (null = sin límite)
+      use_colnames: true  # Usar nombres de columnas en lugar de índices
+    fpgrowth:
+      min_support: 0.1  # Soporte mínimo para itemsets frecuentes (0.0-1.0)
+      min_confidence: 0.5  # Confianza mínima para reglas (0.0-1.0)
+      min_lift: 1.0  # Lift mínimo para reglas (valores > 1.0 indican asociación positiva)
+      max_len: null  # Longitud máxima de itemsets (null = sin límite)
+      use_colnames: true  # Usar nombres de columnas en lugar de índices

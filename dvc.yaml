@@ -35,4 +35,72 @@ stages:
       - data/07_model_output/regression_metrics.json:
           cache: false
 
+  # Unsupervised Learning - Clustering
+  unsupervised_learning:
+    cmd: kedro run --pipeline=unsupervised_learning
+    deps:
+      - data/05_model_input/train_data.csv
+    outs:
+      - data/06_models/clustering/:
+          persist: true
+    metrics:
+      - data/07_model_output/kmeans_metrics.json:
+          cache: false
+      - data/07_model_output/optics_metrics.json:
+          cache: false
+      - data/07_model_output/hierarchical_metrics.json:
+          cache: false
+      - data/08_reporting/clustering_comparison.json:
+          cache: false
+
+  # Unsupervised Learning - Dimensionality Reduction
+  dimensionality_reduction:
+    cmd: kedro run --pipeline=dimensionality_reduction
+    deps:
+      - data/05_model_input/train_data.csv
+    outs:
+      - data/06_models/dimensionality_reduction/:
+          persist: true
+    metrics:
+      - data/07_model_output/pca_metrics.json:
+          cache: false
+      - data/07_model_output/umap_metrics.json:
+          cache: false
+      - data/08_reporting/dimensionality_reduction_comparison.json:
+          cache: false
+
+  # Unsupervised Learning - Anomaly Detection
+  anomaly_detection:
+    cmd: kedro run --pipeline=anomaly_detection
+    deps:
+      - data/05_model_input/train_data.csv
+    outs:
+      - data/06_models/anomaly_detection/:
+          persist: true
+    metrics:
+      - data/07_model_output/isolation_forest_metrics.json:
+          cache: false
+      - data/07_model_output/lof_metrics.json:
+          cache: false
+      - data/07_model_output/oneclass_svm_metrics.json:
+          cache: false
+      - data/08_reporting/anomaly_detection_comparison.json:
+          cache: false
+
+  # Unsupervised Learning - Association Rules
+  association_rules:
+    cmd: kedro run --pipeline=association_rules
+    deps:
+      - data/05_model_input/train_data.csv
+    outs:
+      - data/06_models/association_rules/:
+          persist: true
+    metrics:
+      - data/07_model_output/apriori_metrics.json:
+          cache: false
+      - data/07_model_output/fpgrowth_metrics.json:
+          cache: false
+      - data/08_reporting/association_rules_comparison.json:
+          cache: false
+
 

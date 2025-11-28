@@ -11,7 +11,9 @@ from .pipelines import (
     create_classification_pipeline,
     create_regression_pipeline,
     create_unsupervised_learning_pipeline,
-    create_dimensionality_reduction_pipeline
+    create_dimensionality_reduction_pipeline,
+    create_anomaly_detection_pipeline,
+    create_association_rules_pipeline
 )
 
 
@@ -46,6 +48,12 @@ def register_pipelines() -> dict[str, Pipeline]:
     
     # Pipeline específico para reducción de dimensionalidad
     pipelines["dimensionality_reduction"] = create_dimensionality_reduction_pipeline()
+    
+    # Pipeline específico para detección de anomalías
+    pipelines["anomaly_detection"] = create_anomaly_detection_pipeline()
+    
+    # Pipeline específico para reglas de asociación
+    pipelines["association_rules"] = create_association_rules_pipeline()
     
     # Pipeline por defecto incluye todos los pipelines
     pipelines["__default__"] = sum(pipelines.values())

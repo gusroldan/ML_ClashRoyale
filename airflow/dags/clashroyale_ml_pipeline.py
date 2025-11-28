@@ -15,7 +15,7 @@ default_args = {
 dag = DAG(
     'clashroyale_ml_with_datacleaning',
     default_args=default_args,
-    description='Pipeline ML completo (incluye data_preparation) para Clash Royale',
+    description='Pipeline ML completo: data_engineering → supervised → unsupervised para Clash Royale',
     schedule='@weekly',
     catchup=False,
 )
@@ -136,7 +136,49 @@ dimensionality_reduction = BashOperator(
     dag=dag,
 )
 
+# Tarea 8: Pipeline de Detección de Anomalías (Aprendizaje No Supervisado)
+anomaly_detection = BashOperator(
+    task_id='anomaly_detection_pipeline',
+    bash_command=f'''
+        set -e
+        cd {PROJECT_ROOT} || {{ echo "Error: No se pudo cambiar a {PROJECT_ROOT}"; exit 1; }}
+        echo "Directorio actual: $(pwd)"
+        echo "Verificando que pyproject.toml existe..."
+        test -f pyproject.toml || {{ echo "Error: pyproject.toml no encontrado"; exit 1; }}
+        echo "Verificando que train_data existe..."
+        test -f data/05_model_input/train_data.csv || {{ echo "Error: train_data.csv no encontrado"; exit 1; }}
+        echo "Ejecutando pipeline: anomaly_detection"
+        python -m kedro run --pipeline=anomaly_detection
+    ''',
+    dag=dag,
+)
+
+# Tarea 9: Pipeline de Reglas de Asociación (Aprendizaje No Supervisado)
+association_rules = BashOperator(
+    task_id='association_rules_pipeline',
+    bash_command=f'''
+        set -e
+        cd {PROJECT_ROOT} || {{ echo "Error: No se pudo cambiar a {PROJECT_ROOT}"; exit 1; }}
+        echo "Directorio actual: $(pwd)"
+        echo "Verificando que pyproject.toml existe..."
+        test -f pyproject.toml || {{ echo "Error: pyproject.toml no encontrado"; exit 1; }}
+        echo "Verificando que train_data existe..."
+        test -f data/05_model_input/train_data.csv || {{ echo "Error: train_data.csv no encontrado"; exit 1; }}
+        echo "Ejecutando pipeline: association_rules"
+        python -m kedro run --pipeline=association_rules
+    ''',
+    dag=dag,
+)
+
 # Definir orden de ejecución
-business_understanding >> data_cleaning >> feature_engineering >> [classification, regression, clustering, dimensionality_reduction]
+# Flujo: data_engineering → supervised → unsupervised
+data_engineering = [business_understanding, data_cleaning, feature_engineering]
+supervised = [classification, regression]
+unsupervised = [clustering, dimensionality_reduction, anomaly_detection, association_rules]
+
+# Dependencias: data_engineering → supervised → unsupervised
+business_understanding >> data_cleaning >> feature_engineering
+feature_engineering >> supervised
+feature_engineering >> unsupervised
 
 

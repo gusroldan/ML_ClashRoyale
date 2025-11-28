@@ -8,6 +8,8 @@ from .classification import create_classification_pipeline
 from .regression import create_regression_pipeline
 from .unsupervised_learning import create_unsupervised_learning_pipeline
 from .dimensionality_reduction import create_dimensionality_reduction_pipeline
+from .anomaly_detection import create_anomaly_detection_pipeline
+from .association_rules import create_association_rules_pipeline
 
 __all__ = [
     "create_business_understanding_pipeline",
@@ -17,6 +19,8 @@ __all__ = [
     "create_classification_pipeline",
     "create_regression_pipeline",
     "create_unsupervised_learning_pipeline",
-    "create_dimensionality_reduction_pipeline"
+    "create_dimensionality_reduction_pipeline",
+    "create_anomaly_detection_pipeline",
+    "create_association_rules_pipeline"
 ]
 
