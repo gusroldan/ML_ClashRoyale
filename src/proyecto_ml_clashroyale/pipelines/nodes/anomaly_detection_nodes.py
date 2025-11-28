@@ -428,13 +428,26 @@ def create_anomaly_detection_comparison(
         }
     }
     
+    # Verificar si autoencoder está disponible
     if autoencoder_result is not None:
-        comparison['autoencoder'] = {
-            'n_anomalies': int(autoencoder_result['metrics']['n_anomalies']),
-            'anomaly_percentage': float(autoencoder_result['metrics']['anomaly_percentage']),
-            'mean_score': float(np.mean(autoencoder_result['metrics']['scores'])),
-            'threshold': float(autoencoder_result['metrics']['threshold'])
-        }
+        metrics = autoencoder_result.get('metrics', {})
+        # Verificar si el autoencoder está realmente disponible (no es dummy)
+        if metrics.get('available', True) and metrics.get('scores') and len(metrics.get('scores', [])) > 0:
+            comparison['autoencoder'] = {
+                'n_anomalies': int(metrics['n_anomalies']),
+                'anomaly_percentage': float(metrics['anomaly_percentage']),
+                'mean_score': float(np.mean(metrics['scores'])),
+                'threshold': float(metrics.get('threshold', 0.0))
+            }
+        else:
+            # Autoencoder no disponible (TensorFlow no instalado)
+            comparison['autoencoder'] = {
+                'n_anomalies': 0,
+                'anomaly_percentage': 0.0,
+                'mean_score': 0.0,
+                'available': False,
+                'message': metrics.get('message', 'TensorFlow no disponible')
+            }
     
     # Resumen
     comparison['summary'] = {

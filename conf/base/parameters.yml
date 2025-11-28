@@ -16,6 +16,10 @@ classification:
   cv_folds: 3  # Reducido de 5 a 3 para usar menos recursos
   scoring: 'roc_auc'
   random_state: 42
+  shap:
+    n_samples_explain: 100  # Número de muestras a explicar con SHAP
+    n_background_samples: 100  # Número de muestras de fondo para SHAP
+    top_n_features: 20  # Top N features más importantes a reportar
   models:
     logistic_regression:
       param_grid:
@@ -46,6 +50,10 @@ regression:
   cv_folds: 3  # Aún más reducido para usar menos recursos
   scoring: 'neg_mean_absolute_error'
   random_state: 42
+  shap:
+    n_samples_explain: 100  # Número de muestras a explicar con SHAP
+    n_background_samples: 100  # Número de muestras de fondo para SHAP
+    top_n_features: 20  # Top N features más importantes a reportar
   models:
     linear_regression:
       param_grid:

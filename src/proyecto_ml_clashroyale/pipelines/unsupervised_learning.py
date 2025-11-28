@@ -3,13 +3,14 @@
 from kedro.pipeline import Pipeline, node
 from typing import Dict
 from proyecto_ml_clashroyale.pipelines.nodes import unsupervised_learning_nodes
+from proyecto_ml_clashroyale.pipelines.nodes import cluster_analysis_nodes
 
 
 def create_unsupervised_learning_pipeline(**kwargs) -> Pipeline:
-    """Crear pipeline de clustering.
+    """Crear pipeline de clustering con análisis profundo.
     
     Returns:
-        Pipeline de clustering
+        Pipeline de clustering con análisis de patrones
     """
     
     return Pipeline(
@@ -41,6 +42,28 @@ def create_unsupervised_learning_pipeline(**kwargs) -> Pipeline:
                 outputs="clustering_comparison",
                 name="create_clustering_comparison_node",
                 tags=["unsupervised_learning", "evaluation"],
+            ),
+            # Análisis profundo de clusters - OPTICS (mejor modelo)
+            node(
+                func=cluster_analysis_nodes.analyze_cluster_statistics,
+                inputs=["train_data", "optics_result", "params:unsupervised_learning"],
+                outputs="optics_cluster_statistics",
+                name="analyze_optics_cluster_statistics_node",
+                tags=["unsupervised_learning", "cluster_analysis", "statistics"],
+            ),
+            node(
+                func=cluster_analysis_nodes.create_cluster_profiles,
+                inputs=["optics_cluster_statistics", "card_master_list"],
+                outputs="optics_cluster_profiles",
+                name="create_optics_cluster_profiles_node",
+                tags=["unsupervised_learning", "cluster_analysis", "profiles"],
+            ),
+            node(
+                func=cluster_analysis_nodes.create_business_interpretation,
+                inputs="optics_cluster_profiles",
+                outputs="optics_business_interpretation",
+                name="create_optics_business_interpretation_node",
+                tags=["unsupervised_learning", "cluster_analysis", "business"],
             ),
         ]
     )

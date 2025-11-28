@@ -50,9 +50,34 @@ def create_anomaly_detection_pipeline(**kwargs) -> Pipeline:
             )
         )
     except ImportError:
-        # Crear nodo dummy que retorne None si TensorFlow no está disponible
+        # Crear nodo dummy que retorne un diccionario válido si TensorFlow no está disponible
         def dummy_autoencoder(*args, **kwargs):
-            return None, {"model_name": "Autoencoder", "message": "TensorFlow no disponible"}
+            # Retornar estructura válida en lugar de None
+            dummy_result = {
+                'model': None,
+                'scaler': None,
+                'predictions': None,
+                'anomaly_labels': None,
+                'scores': None,
+                'metrics': {
+                    'n_anomalies': 0,
+                    'n_normal': 0,
+                    'anomaly_percentage': 0.0,
+                    'scores': [],
+                    'parameters': {},
+                    'available': False,
+                    'message': 'TensorFlow no disponible'
+                }
+            }
+            dummy_metrics = {
+                'model_name': 'Autoencoder',
+                'n_anomalies': 0,
+                'n_normal': 0,
+                'anomaly_percentage': 0.0,
+                'message': 'TensorFlow no disponible',
+                'available': False
+            }
+            return dummy_result, dummy_metrics
         
         nodes_list.append(
             node(

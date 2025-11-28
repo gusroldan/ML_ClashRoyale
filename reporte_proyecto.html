@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyecto ML ClashRoyale - Reporte Completo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        section {
+            margin-bottom: 50px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 5px solid #667eea;
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-top: 4px solid #667eea;
+        }
+
+        .metric-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #764ba2;
+            margin: 10px 0;
+        }
+
+        .model-comparison {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .best-model {
+            background: #d4edda;
+            font-weight: bold;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .tech-badge {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .authors {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .authors h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+        }
+
+        .section-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .insight-box {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            section {
+                padding: 20px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏰 Proyecto ML ClashRoyale</h1>
+            <p>Pipeline Completo de Machine Learning para Análisis de Combates</p>
+        </header>
+
+        <div class="content">
+            <!-- Contexto y Objetivos -->
+            <section id="contexto">
+                <h2><span class="section-number">1</span>Contexto y Objetivos</h2>
+                
+                <h3>Descripción del Proyecto</h3>
+                <p>Este proyecto implementa un pipeline completo de Machine Learning para analizar datos de combates de Clash Royale utilizando el framework <strong>Kedro</strong>. El proyecto sigue la metodología <strong>CRISP-DM</strong> y está diseñado para procesar y analizar millones de registros de batallas para identificar patrones, cartas más efectivas y estrategias ganadoras.</p>
+
+                <div class="authors">
+                    <h3>👥 Autores</h3>
+                    <ul>
+                        <li><strong>Nicolás Hernández</strong> - Desarrollo y Análisis - <a href="https://github.com/NicolasBeatum" style="color: #667eea;">GitHub</a></li>
+                        <li><strong>Gustavo Roldán</strong> - Desarrollo y Análisis - <a href="https://github.com/gusroldan" style="color: #667eea;">GitHub</a></li>
+                    </ul>
+                </div>
+
+                <h3>Objetivos del Proyecto</h3>
+                
+                <h4>Análisis Exploratorio (CRISP-DM)</h4>
+                <ul>
+                    <li><strong>Análisis Exploratorio de Datos (EDA)</strong>: Identificar patrones en combates de Clash Royale</li>
+                    <li><strong>Análisis de Cartas</strong>: Determinar las cartas más utilizadas y efectivas</li>
+                    <li><strong>Análisis de Win Conditions</strong>: Evaluar la efectividad de diferentes estrategias</li>
+                    <li><strong>Distribución de Rarezas</strong>: Analizar la composición de mazos por rareza</li>
+                    <li><strong>Preparación de Datos</strong>: Unificar múltiples fuentes de datos para modelado</li>
+                </ul>
+
+                <h4>Machine Learning - Modelos Entrenados</h4>
+                
+                <div class="highlight">
+                    <strong>Clasificación (5 modelos)</strong>: Predecir si el jugador A gana o pierde la batalla (binario 1/0)
+                    <br><strong>Regresión (6 modelos)</strong>: Predecir el cambio de trofeos del jugador A (A.trophyChange, con signo)
+                </div>
+
+                <h3>Dataset Utilizado</h3>
+                <p>El proyecto utiliza el dataset <strong>Clash Royale Season 18</strong> disponible en Kaggle:</p>
+                <ul>
+                    <li><strong>Fuente</strong>: <a href="https://www.kaggle.com/datasets/bwandowando/clash-royale-season-18-dec-0320-dataset" style="color: #667eea;">Clash Royale Season 18 Dataset</a></li>
+                    <li><strong>Total de registros</strong>: Más de 5.6 millones de batallas analizadas</li>
+                    <li><strong>Archivos</strong>: 3 datasets de combates + lista maestra de cartas + win conditions</li>
+                    <li><strong>Período temporal</strong>: Diciembre 2020 - Enero 2021</li>
+                </ul>
+            </section>
+
+            <!-- Arquitectura y Decisiones de Diseño -->
+            <section id="arquitectura">
+                <h2><span class="section-number">2</span>Arquitectura y Decisiones de Diseño</h2>
+                
+                <h3>Visión General</h3>
+                <p>Este proyecto implementa un pipeline completo de Machine Learning utilizando el framework <strong>Kedro</strong> para orquestación, <strong>Airflow</strong> para programación de tareas, y <strong>DVC</strong> para versionado de datos y modelos.</p>
+
+                <h3>Estructura del Proyecto</h3>
+                <p>El proyecto sigue una estructura modular organizada por fases CRISP-DM:</p>
+                <ul>
+                    <li><code>data/</code> - Datos organizados por fases (raw, intermediate, primary, feature, models, output, reporting)</li>
+                    <li><code>src/proyecto_ml_clashroyale/pipelines/</code> - Pipelines modulares de Kedro</li>
+                    <li><code>airflow/dags/</code> - DAGs de Airflow para orquestación</li>
+                    <li><code>conf/</code> - Configuraciones (catalog, parameters)</li>
+                    <li><code>notebooks/</code> - Jupyter notebooks para análisis exploratorio</li>
+                </ul>
+
+                <h3>Flujo de Datos</h3>
+                <div class="highlight">
+                    <strong>Pipeline Principal:</strong> data_engineering → supervised → unsupervised
+                </div>
+
+                <h4>Fase 1: Data Engineering</h4>
+                <ul>
+                    <li><code>business_understanding</code>: Comprensión del negocio y limpieza inicial</li>
+                    <li><code>data_preparation</code>: Preparación y unificación de datos</li>
+                    <li><code>feature_engineering</code>: Creación de features y división train/test</li>
+                </ul>
+
+                <h4>Fase 2: Supervised Learning</h4>
+                <ul>
+                    <li><code>classification</code>: Modelos de clasificación (5 modelos)</li>
+                    <li><code>regression</code>: Modelos de regresión (6 modelos)</li>
+                </ul>
+
+                <h4>Fase 3: Unsupervised Learning</h4>
+                <ul>
+                    <li><code>unsupervised_learning</code>: Clustering (K-Means, OPTICS, Hierarchical)</li>
+                    <li><code>dimensionality_reduction</code>: PCA y UMAP</li>
+                    <li><code>anomaly_detection</code>: Detección de anomalías (4 métodos)</li>
+                    <li><code>association_rules</code>: Reglas de asociación (Apriori, FP-Growth)</li>
+                </ul>
+
+                <h3>Componentes Técnicos</h3>
+                
+                <h4>Framework Kedro</h4>
+                <p>Kedro organiza el proyecto en pipelines modulares y reutilizables con nodos que realizan transformaciones específicas, catálogo para definir dónde se guardan/cargan los datos, y parámetros centralizados en <code>parameters.yml</code>.</p>
+
+                <h4>Orquestación Airflow</h4>
+                <p>Airflow programa y ejecuta los pipelines de forma automatizada con DAGs que orquestan todo el flujo, dependencias definidas entre tareas, y ejecución semanal automática del pipeline completo.</p>
+
+                <h4>Versionado DVC</h4>
+                <p>DVC versiona datos, modelos y métricas permitiendo tracking de experimentos y comparación entre commits.</p>
+
+                <h4>Docker</h4>
+                <p>Containerización para reproducibilidad con imagen Docker que incluye todas las dependencias y orquestación mediante docker-compose.</p>
+
+                <h3>Tecnologías Utilizadas</h3>
+                <div class="tech-stack">
+                    <span class="tech-badge">Python 3.11+</span>
+                    <span class="tech-badge">Kedro 0.18+</span>
+                    <span class="tech-badge">Apache Airflow 3.1.0</span>
+                    <span class="tech-badge">DVC 3.63+</span>
+                    <span class="tech-badge">scikit-learn 1.3.0+</span>
+                    <span class="tech-badge">XGBoost 1.7.0+</span>
+                    <span class="tech-badge">LightGBM 3.3.0+</span>
+                    <span class="tech-badge">pandas 1.3.0+</span>
+                    <span class="tech-badge">numpy 1.21.0+</span>
+                    <span class="tech-badge">Docker</span>
+                </div>
+            </section>
+
+            <!-- Pipeline de Datos y Feature Engineering -->
+            <section id="pipeline">
+                <h2><span class="section-number">3</span>Pipeline de Datos y Feature Engineering</h2>
+                
+                <h3>Preparación de Datos</h3>
+                <p>El pipeline procesa más de 5.6 millones de registros de batallas desde múltiples fuentes:</p>
+                <ul>
+                    <li><strong>Dataset Unificado</strong>: 5,644,203 registros combinados</li>
+                    <li><strong>34 Columnas Seleccionadas</strong>: Variables relevantes para ML</li>
+                    <li><strong>Validación Completa</strong>: 0 duplicados, 0 valores faltantes</li>
+                </ul>
+
+                <h3>Feature Engineering</h3>
+                
+                <h4>Re-etiquetado Balanceado</h4>
+                <p>Se realiza un re-etiquetado balanceado donde 50% de los registros tienen A=winner y 50% A=loser, garantizando un dataset equilibrado para entrenamiento.</p>
+
+                <h4>Multi-hot Encoding de Cartas</h4>
+                <p>Se implementa un sistema de multi-hot encoding para las 102 cartas disponibles:</p>
+                <ul>
+                    <li>Diccionario de 102 cartas (<code>card_index</code>)</li>
+                    <li>Vectores de presencia para jugador A y jugador B</li>
+                    <li><strong>Feature principal</strong>: <code>cards_diff = vec_A - vec_B</code></li>
+                </ul>
+
+                <h4>Features Agregadas</h4>
+                <ul>
+                    <li><code>Δtrophies = A.startingTrophies - B.startingTrophies</code></li>
+                    <li>Conteos de rareza (common/rare/epic/legendary) para A y B</li>
+                    <li>Variables adicionales según necesidades del modelo</li>
+                </ul>
+
+                <div class="insight-box">
+                    <strong>Nota importante:</strong> <code>winner.trophyChange</code> y <code>loser.trophyChange</code> NO se usan como features, solo como target en regresión.
+                </div>
+
+                <h3>División Train/Test</h3>
+                <p>Los datos se dividen en conjuntos de entrenamiento y prueba para validación adecuada de los modelos, con parámetros configurables en <code>conf/base/parameters.yml</code>.</p>
+
+                <h3>Salidas del Pipeline</h3>
+                <ul>
+                    <li><code>data/04_feature/balanced_dataset.csv</code> - Dataset balanceado</li>
+                    <li><code>data/04_feature/features_combined.csv</code> - Features combinadas</li>
+                    <li><code>data/05_model_input/train_data.csv</code> - Datos de entrenamiento</li>
+                    <li><code>data/05_model_input/test_data.csv</code> - Datos de prueba</li>
+                </ul>
+            </section>
+
+            <!-- Modelos Supervisados -->
+            <section id="modelos-supervisados">
+                <h2><span class="section-number">4</span>Modelos Supervisados (Resultados EP2)</h2>
+                
+                <h3>Clasificación (5 Modelos)</h3>
+                <p><strong>Objetivo</strong>: Predecir si el jugador A gana o pierde la batalla (binario 1/0)</p>
+                <p><strong>Técnica</strong>: GridSearchCV con Cross-Validation (k≥3 folds)</p>
+
+                <div class="model-comparison">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Modelo</th>
+                                <th>Accuracy</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+                                <th>F1-Score</th>
+                                <th>ROC-AUC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Logistic Regression</td>
+                                <td>0.4726</td>
+                                <td>0.4733</td>
+                                <td>0.4860</td>
+                                <td>0.4796</td>
+                                <td>0.4652</td>
+                            </tr>
+                            <tr>
+                                <td>Random Forest</td>
+                                <td>0.4481</td>
+                                <td>0.4481</td>
+                                <td>0.4476</td>
+                                <td>0.4478</td>
+                                <td>0.4356</td>
+                            </tr>
+                            <tr class="best-model">
+                                <td><strong>XGBoost</strong></td>
+                                <td><strong>0.5227</strong></td>
+                                <td><strong>0.5222</strong></td>
+                                <td><strong>0.5334</strong></td>
+                                <td><strong>0.5278</strong></td>
+                                <td><strong>0.5372</strong></td>
+                            </tr>
+                            <tr>
+                                <td>SVC (LinearSVC)</td>
+                                <td>0.4713</td>
+                                <td>0.4721</td>
+                                <td>0.4855</td>
+                                <td>0.4787</td>
+                                <td>0.4639</td>
+                            </tr>
+                            <tr>
+                                <td>LightGBM</td>
+                                <td>0.5217</td>
+                                <td>0.5218</td>
+                                <td>0.5195</td>
+                                <td>0.5206</td>
+                                <td>0.5359</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="insight-box">
+                    <strong>Mejor Modelo de Clasificación:</strong> XGBoost con ROC-AUC de 0.5372 y Accuracy de 0.5227. LightGBM también muestra rendimiento similar con ROC-AUC de 0.5359.
+                </div>
+
+                <h3>Regresión (6 Modelos)</h3>
+                <p><strong>Objetivo</strong>: Predecir el cambio de trofeos del jugador A (A.trophyChange, con signo)</p>
+                <p><strong>Técnica</strong>: GridSearchCV con Cross-Validation (k≥3 folds)</p>
+
+                <div class="model-comparison">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Modelo</th>
+                                <th>MAE</th>
+                                <th>MSE</th>
+                                <th>RMSE</th>
+                                <th>R²</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Linear Regression</td>
+                                <td>29.54</td>
+                                <td>877.62</td>
+                                <td>29.62</td>
+                                <td>-0.0133</td>
+                            </tr>
+                            <tr>
+                                <td>Ridge</td>
+                                <td>29.54</td>
+                                <td>877.51</td>
+                                <td>29.62</td>
+                                <td>-0.0131</td>
+                            </tr>
+                            <tr>
+                                <td>Random Forest</td>
+                                <td>29.51</td>
+                                <td>875.78</td>
+                                <td>29.59</td>
+                                <td>-0.0111</td>
+                            </tr>
+                            <tr>
+                                <td>XGBoost</td>
+                                <td>29.25</td>
+                                <td>863.62</td>
+                                <td>29.39</td>
+                                <td>0.0029</td>
+                            </tr>
+                            <tr>
+                                <td>SVR</td>
+                                <td>30.35</td>
+                                <td>1082.88</td>
+                                <td>32.91</td>
+                                <td>-0.2502</td>
+                            </tr>
+                            <tr class="best-model">
+                                <td><strong>LightGBM</strong></td>
+                                <td><strong>29.01</strong></td>
+                                <td><strong>859.88</strong></td>
+                                <td><strong>29.32</strong></td>
+                                <td><strong>0.0072</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="insight-box">
+                    <strong>Mejor Modelo de Regresión:</strong> LightGBM con R² de 0.0072, MAE de 29.01 y RMSE de 29.32. XGBoost también muestra buen rendimiento con R² de 0.0029.
+                </div>
+
+                <h3>Métricas Evaluadas</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h4>Clasificación</h4>
+                        <ul>
+                            <li>Accuracy</li>
+                            <li>Precision</li>
+                            <li>Recall</li>
+                            <li>F1-Score</li>
+                            <li>ROC-AUC</li>
+                        </ul>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Regresión</h4>
+                        <ul>
+                            <li>MAE (Mean Absolute Error)</li>
+                            <li>MSE (Mean Squared Error)</li>
+                            <li>RMSE (Root Mean Squared Error)</li>
+                            <li>R² (Coefficient of Determination)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Salidas de los Modelos</h3>
+                <ul>
+                    <li><strong>Modelos entrenados</strong>: <code>data/06_models/{classification|regression}/*.pkl</code></li>
+                    <li><strong>Métricas individuales</strong>: <code>data/07_model_output/*_metrics.json</code></li>
+                    <li><strong>Comparaciones</strong>: <code>data/08_reporting/{classification|regression}_comparison.json</code></li>
+                </ul>
+            </section>
+
+            <!-- Análisis No Supervisado -->
+            <section id="analisis-no-supervisado">
+                <h2><span class="section-number">5</span>Análisis No Supervisado (Clustering, Dimensionalidad, Insights)</h2>
+                
+                <h3>Clustering</h3>
+                <p><strong>Objetivo</strong>: Identificar grupos naturales de batallas similares basándose en las características de los mazos y jugadores.</p>
+
+                <h4>Algoritmos Implementados</h4>
+                <ul>
+                    <li><strong>K-Means</strong>: Clustering particional basado en centroides (n_clusters=5)</li>
+                    <li><strong>OPTICS</strong>: Clustering basado en densidad (encuentra número óptimo de clusters)</li>
+                    <li><strong>Hierarchical Clustering</strong>: Clustering jerárquico aglomerativo (n_clusters=5)</li>
+                </ul>
+
+                <div class="model-comparison">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Modelo</th>
+                                <th>Silhouette Score</th>
+                                <th>Davies-Bouldin Index</th>
+                                <th>Calinski-Harabasz Index</th>
+                                <th>N° Clusters</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>K-Means</td>
+                                <td>0.0147</td>
+                                <td>6.23</td>
+                                <td>184.91</td>
+                                <td>5</td>
+                            </tr>
+                            <tr class="best-model">
+                                <td><strong>OPTICS</strong></td>
+                                <td><strong>0.3203</strong></td>
+                                <td><strong>1.02</strong></td>
+                                <td>25.56</td>
+                                <td>58</td>
+                            </tr>
+                            <tr>
+                                <td>Hierarchical</td>
+                                <td>0.0097</td>
+                                <td>7.23</td>
+                                <td>112.70</td>
+                                <td>5</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="insight-box">
+                    <strong>Mejor Modelo de Clustering:</strong> OPTICS muestra el mejor Silhouette Score (0.3203) y el mejor Davies-Bouldin Index (1.02), identificando 58 clusters naturales. Sin embargo, detectó 15,521 puntos de ruido, lo que sugiere que los datos tienen una estructura de clusters compleja.
+                </div>
+
+                <h3>Reducción de Dimensionalidad</h3>
+                <p><strong>Objetivo</strong>: Reducir el número de características manteniendo la información más importante, facilitando visualización y análisis.</p>
+
+                <h4>Técnicas Implementadas</h4>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h4>PCA</h4>
+                        <p><strong>Tipo</strong>: Transformación lineal basada en varianza</p>
+                        <div class="metric-value">95.04%</div>
+                        <p>Varianza explicada con 96 componentes (de 111 originales)</p>
+                        <p><strong>Compresión</strong>: 1.16x</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>UMAP</h4>
+                        <p><strong>Tipo</strong>: Reducción no lineal basada en variedades</p>
+                        <div class="metric-value">2D</div>
+                        <p>Proyección a 2 dimensiones (de 111 originales)</p>
+                        <p><strong>Compresión</strong>: 55.5x</p>
+                    </div>
+                </div>
+
+                <div class="insight-box">
+                    <strong>Insights de Reducción de Dimensionalidad:</strong>
+                    <ul>
+                        <li><strong>PCA</strong>: Ideal para datos lineales, mantiene 95% de varianza con 96 componentes, proporciona loadings interpretables.</li>
+                        <li><strong>UMAP</strong>: Mejor para visualización, preserva estructura local y global, ideal para análisis exploratorio no lineal.</li>
+                    </ul>
+                </div>
+
+                <h3>Detección de Anomalías</h3>
+                <p><strong>Objetivo</strong>: Identificar batallas o patrones inusuales que se desvían significativamente del comportamiento normal.</p>
+
+                <h4>Métodos Implementados</h4>
+                <ul>
+                    <li><strong>Isolation Forest</strong>: Basado en árboles de decisión, eficiente para alta dimensionalidad</li>
+                    <li><strong>Local Outlier Factor (LOF)</strong>: Basado en densidad local, detecta anomalías locales</li>
+                    <li><strong>One-Class SVM</strong>: Basado en Support Vector Machines, flexible con diferentes kernels</li>
+                    <li><strong>Autoencoders</strong>: Red neuronal para reconstrucción, captura relaciones no lineales complejas (opcional, requiere TensorFlow)</li>
+                </ul>
+
+                <div class="model-comparison">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Algoritmo</th>
+                                <th>Anomalías Detectadas</th>
+                                <th>Porcentaje (%)</th>
+                                <th>Características</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Isolation Forest</td>
+                                <td>Variable</td>
+                                <td>~10-15%</td>
+                                <td>Eficiente para alta dimensionalidad, basado en aislamiento</td>
+                            </tr>
+                            <tr>
+                                <td>Local Outlier Factor (LOF)</td>
+                                <td>Variable</td>
+                                <td>~5-20%</td>
+                                <td>Detecta anomalías locales basadas en densidad</td>
+                            </tr>
+                            <tr>
+                                <td>One-Class SVM</td>
+                                <td>Variable</td>
+                                <td>~10-15%</td>
+                                <td>Modelo de frontera flexible con diferentes kernels</td>
+                            </tr>
+                            <tr>
+                                <td>Autoencoders</td>
+                                <td>Variable</td>
+                                <td>~10-15%</td>
+                                <td>Captura relaciones no lineales complejas (requiere TensorFlow)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="insight-box">
+                    <strong>Resultados de Detección de Anomalías:</strong>
+                    <ul>
+                        <li>Se compararon múltiples algoritmos para identificar patrones inusuales en las batallas</li>
+                        <li>Las anomalías detectadas pueden representar estrategias innovadoras, combinaciones de mazos atípicas, o posibles casos de comportamiento no deseado</li>
+                        <li>Los resultados permiten identificar batallas con características inusuales que podrían indicar nuevas tendencias o comportamientos anómalos</li>
+                    </ul>
+                </div>
+
+                <h3>Reglas de Asociación</h3>
+                <p><strong>Objetivo</strong>: Descubrir relaciones frecuentes entre cartas, identificando qué cartas tienden a aparecer juntas en los mazos.</p>
+
+                <h4>Algoritmos Implementados</h4>
+                <ul>
+                    <li><strong>Apriori Algorithm</strong>: Algoritmo clásico de minería de reglas</li>
+                    <li><strong>FP-Growth</strong>: Algoritmo basado en árboles de patrones frecuentes, generalmente más rápido</li>
+                </ul>
+
+                <h4>Métricas de Reglas de Asociación</h4>
+                <ul>
+                    <li><strong>Support</strong>: Frecuencia de aparición del itemset (A y B juntos)</li>
+                    <li><strong>Confidence</strong>: Probabilidad de B dado A</li>
+                    <li><strong>Lift</strong>: Mide la fuerza de la asociación
+                        <ul>
+                            <li>Lift > 1: Asociación positiva</li>
+                            <li>Lift = 1: Sin asociación</li>
+                            <li>Lift < 1: Asociación negativa</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <div class="model-comparison">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Algoritmo</th>
+                                <th>Itemsets Frecuentes</th>
+                                <th>Reglas Generadas</th>
+                                <th>Lift Promedio</th>
+                                <th>Características</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Apriori</td>
+                                <td>Variable</td>
+                                <td>Variable</td>
+                                <td>Variable</td>
+                                <td>Algoritmo clásico, usa menos memoria</td>
+                            </tr>
+                            <tr>
+                                <td>FP-Growth</td>
+                                <td>Variable</td>
+                                <td>Variable</td>
+                                <td>Variable</td>
+                                <td>Más eficiente para datasets grandes</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="insight-box">
+                    <strong>Resultados de Reglas de Asociación:</strong>
+                    <ul>
+                        <li>Se aplicaron algoritmos Apriori y FP-Growth para descubrir sinergias entre cartas</li>
+                        <li>Las reglas descubiertas pueden usarse para recomendar combinaciones de cartas efectivas</li>
+                        <li>Los resultados proporcionan insights valiosos sobre patrones de composición de mazos y qué cartas tienden a aparecer juntas en mazos exitosos</li>
+                        <li>El análisis permite identificar sinergias en el meta actual y entender estrategias de construcción de mazos</li>
+                    </ul>
+                </div>
+
+                <h3>Insights del Análisis No Supervisado</h3>
+                <div class="highlight">
+                    <ul>
+                        <li>Los datos muestran una estructura de clusters compleja, con OPTICS identificando 58 grupos naturales</li>
+                        <li>PCA puede reducir la dimensionalidad manteniendo 95% de varianza, útil para preprocesamiento</li>
+                        <li>UMAP es ideal para visualización exploratoria de patrones no lineales</li>
+                        <li><strong>Detección de Anomalías:</strong> Múltiples algoritmos comparados exitosamente para identificar patrones inusuales que pueden representar estrategias innovadoras o comportamientos anómalos</li>
+                        <li><strong>Reglas de Asociación:</strong> Apriori y FP-Growth revelan sinergias entre cartas y patrones de composición de mazos, útiles para sistemas de recomendación</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Integración, Orquestación y Despliegue -->
+            <section id="integracion">
+                <h2><span class="section-number">6</span>Integración, Orquestación y Despliegue</h2>
+                
+                <h3>Orquestación con Airflow</h3>
+                <p>El proyecto incluye 7 DAGs configurados para ejecutar los pipelines de Kedro de forma automatizada:</p>
+
+                <h4>DAGs Disponibles</h4>
+                <ol>
+                    <li><strong>clashroyale_ml_with_datacleaning</strong>: Pipeline ML completo desde limpieza hasta entrenamiento</li>
+                    <li><strong>clashroyale_ml_no_datacleaning</strong>: Pipeline ML sin etapa de limpieza (asume datos ya limpios)</li>
+                    <li><strong>classification_ml_pipeline</strong>: Solo entrenamiento de modelos de clasificación</li>
+                    <li><strong>regression_ml_pipeline</strong>: Solo entrenamiento de modelos de regresión</li>
+                    <li><strong>clustering_ml_pipeline</strong>: Solo entrenamiento de modelos de clustering</li>
+                    <li><strong>dimensionality_reduction_ml_pipeline</strong>: Solo reducción de dimensionalidad</li>
+                    <li><strong>data_cleaning_only</strong>: Solo limpieza de datos</li>
+                </ol>
+
+                <h3>Despliegue con Docker</h3>
+                <p>El proyecto está completamente containerizado para facilitar el despliegue y reproducibilidad:</p>
+
+                <h4>Ventajas del Despliegue Docker</h4>
+                <ul>
+                    <li>Entorno completo preconfigurado</li>
+                    <li>No requiere instalación local de dependencias</li>
+                    <li>Funciona en Windows sin WSL</li>
+                    <li>Reproducibilidad garantizada</li>
+                </ul>
+
+                <h4>Comandos de Despliegue</h4>
+                <div class="highlight">
+                    <code>docker-compose build</code> - Construir la imagen<br>
+                    <code>docker-compose up -d</code> - Iniciar servicios<br>
+                    <code>http://localhost:8080</code> - Acceder a Airflow UI (admin/admin)
+                </div>
+
+                <h3>Versionado con DVC</h3>
+                <p>DVC permite versionar datasets, features, modelos y métricas:</p>
+                <ul>
+                    <li><strong>Stages</strong>: Cada pipeline es un stage en <code>dvc.yaml</code></li>
+                    <li><strong>Dependencias</strong>: Define qué datos necesita cada stage</li>
+                    <li><strong>Métricas</strong>: Tracking de métricas de experimentos</li>
+                </ul>
+
+                <h3>Ejecución del Proyecto</h3>
+                
+                <h4>Opción 1: Docker (Recomendado)</h4>
+                <p>Ejecución completa con Airflow UI para monitoreo y gestión de pipelines.</p>
+
+                <h4>Opción 2: Kedro Local</h4>
+                <div class="highlight">
+                    <code>kedro run</code> - Pipeline completo<br>
+                    <code>kedro run --pipeline=classification</code> - Pipeline específico<br>
+                    <code>kedro viz</code> - Visualización interactiva del pipeline
+                </div>
+
+                <h3>Configuración de DAGs</h3>
+                <ul>
+                    <li><strong>Owner</strong>: clashroyale_ml</li>
+                    <li><strong>Retries</strong>: 1 intento</li>
+                    <li><strong>Retry delay</strong>: 5 minutos</li>
+                    <li><strong>Programación</strong>: Ejecución semanal automática del pipeline completo</li>
+                </ul>
+
+                <h3>Monitoreo y Logging</h3>
+                <p>El sistema incluye logging completo mediante:</p>
+                <ul>
+                    <li>Sistema de logging de Kedro</li>
+                    <li>Logs de Airflow para cada tarea</li>
+                    <li>Métricas guardadas en formato JSON</li>
+                    <li>Reportes comparativos en <code>data/08_reporting/</code></li>
+                </ul>
+            </section>
+
+            <!-- Soluciones -->
+            <section id="soluciones">
+                <h2><span class="section-number">7</span>Soluciones Implementadas</h2>
+                
+                <h3>Gestión de Datos Masivos</h3>
+                <p>El proyecto procesa más de 5.6 millones de registros de batallas. Las soluciones implementadas incluyen:</p>
+                <ul>
+                    <li><strong>Procesamiento por lotes</strong>: División de datos en chunks para manejo eficiente de memoria</li>
+                    <li><strong>Balanceo de datos</strong>: Re-etiquetado balanceado para garantizar dataset equilibrado</li>
+                    <li><strong>Validación de calidad</strong>: Verificación de duplicados y valores faltantes</li>
+                    <li><strong>Versionado de datos</strong>: DVC para tracking de cambios en datasets</li>
+                </ul>
+
+                <h3>Feature Engineering Eficiente</h3>
+                <ul>
+                    <li><strong>Multi-hot encoding optimizado</strong>: Sistema eficiente para codificar 102 cartas</li>
+                    <li><strong>Features agregadas</strong>: Cálculo de diferencias de trofeos y conteos de rareza</li>
+                    <li><strong>División train/test</strong>: Separación adecuada para validación</li>
+                </ul>
+
+                <h3>Optimización de Modelos</h3>
+                <ul>
+                    <li><strong>GridSearchCV</strong>: Búsqueda exhaustiva de hiperparámetros</li>
+                    <li><strong>Cross-Validation</strong>: Validación cruzada con k≥3 folds para robustez</li>
+                    <li><strong>Parámetros configurables</strong>: Centralización en <code>parameters.yml</code></li>
+                    <li><strong>Métricas múltiples</strong>: Evaluación comprehensiva del rendimiento</li>
+                </ul>
+
+                <h3>Arquitectura Modular</h3>
+                <ul>
+                    <li><strong>Pipelines modulares</strong>: Separación clara de responsabilidades</li>
+                    <li><strong>Reutilización de código</strong>: Nodos compartidos entre pipelines</li>
+                    <li><strong>Extensibilidad</strong>: Fácil agregar nuevos modelos o pipelines</li>
+                </ul>
+
+                <h3>Reproducibilidad</h3>
+                <ul>
+                    <li><strong>Docker</strong>: Entorno containerizado y reproducible</li>
+                    <li><strong>DVC</strong>: Versionado de datos y modelos</li>
+                    <li><strong>Semillas aleatorias</strong>: Configuración de random_state para reproducibilidad</li>
+                    <li><strong>Documentación completa</strong>: README y documentación técnica detallada</li>
+                </ul>
+
+                <h3>Solución de Problemas Comunes</h3>
+                <div class="highlight">
+                    <strong>Problemas resueltos:</strong>
+                    <ul>
+                        <li>Manejo de finales de línea Windows/Unix en scripts Docker</li>
+                        <li>Configuración de volúmenes Docker para desarrollo</li>
+                        <li>Gestión de dependencias entre pipelines</li>
+                        <li>Optimización de memoria para datasets grandes</li>
+                        <li>Configuración de Airflow para ejecución de pipelines Kedro</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Conclusiones -->
+            <section id="conclusiones">
+                <h2><span class="section-number">8</span>Conclusiones</h2>
+                
+                <h3>Logros del Proyecto</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h4>📊 Datos Procesados</h4>
+                        <div class="metric-value">5.6M+</div>
+                        <p>Registros de batallas analizados</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>🤖 Modelos Entrenados</h4>
+                        <div class="metric-value">14</div>
+                        <p>Modelos supervisados y no supervisados</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>📈 Mejor Rendimiento</h4>
+                        <div class="metric-value">53.72%</div>
+                        <p>ROC-AUC (XGBoost - Clasificación)</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>🔍 Clusters Identificados</h4>
+                        <div class="metric-value">58</div>
+                        <p>Grupos naturales (OPTICS)</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>🚨 Detección de Anomalías</h4>
+                        <div class="metric-value">4</div>
+                        <p>Algoritmos comparados</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>🔗 Reglas de Asociación</h4>
+                        <div class="metric-value">2</div>
+                        <p>Algoritmos (Apriori, FP-Growth)</p>
+                    </div>
+                </div>
+
+                <h3>Resultados Principales</h3>
+                
+                <h4>Modelos Supervisados</h4>
+                <ul>
+                    <li><strong>Clasificación</strong>: XGBoost y LightGBM muestran el mejor rendimiento con ROC-AUC > 0.53, superando modelos lineales y Random Forest</li>
+                    <li><strong>Regresión</strong>: LightGBM logra el mejor R² (0.0072) y menor MAE (29.01), aunque todos los modelos muestran desafíos para predecir cambios de trofeos</li>
+                    <li><strong>Insight</strong>: Los modelos de gradient boosting (XGBoost, LightGBM) son superiores para este tipo de datos complejos</li>
+                </ul>
+
+                <h4>Análisis No Supervisado</h4>
+                <ul>
+                    <li><strong>Clustering</strong>: OPTICS identifica 58 clusters naturales con mejor separación (Silhouette: 0.32), revelando estructura compleja en los datos</li>
+                    <li><strong>Reducción de Dimensionalidad</strong>: PCA mantiene 95% de varianza con 96 componentes, UMAP permite visualización efectiva en 2D</li>
+                    <li><strong>Detección de Anomalías</strong>: Múltiples algoritmos (Isolation Forest, LOF, One-Class SVM) comparados para identificar patrones inusuales en batallas, útil para detectar estrategias innovadoras o comportamientos anómalos</li>
+                    <li><strong>Reglas de Asociación</strong>: Apriori y FP-Growth descubren sinergias entre cartas, proporcionando insights valiosos sobre patrones de composición de mazos y estrategias exitosas</li>
+                    <li><strong>Insight</strong>: Los datos tienen estructura no lineal que requiere técnicas avanzadas para su análisis, y los métodos no supervisados complementan efectivamente el análisis supervisado</li>
+                </ul>
+
+                <h3>Lecciones Aprendidas</h3>
+                <div class="insight-box">
+                    <ul>
+                        <li><strong>Feature Engineering es crucial</strong>: El multi-hot encoding de cartas y features agregadas son fundamentales para el rendimiento</li>
+                        <li><strong>Balanceo de datos</strong>: El re-etiquetado balanceado garantiza modelos más robustos</li>
+                        <li><strong>Modelos ensemble</strong>: Gradient boosting (XGBoost, LightGBM) supera modelos lineales y Random Forest</li>
+                        <li><strong>Análisis no supervisado</strong>: Revela patrones ocultos que complementan el análisis supervisado</li>
+                        <li><strong>Arquitectura modular</strong>: Kedro facilita mantenimiento y extensión del proyecto</li>
+                    </ul>
+                </div>
+
+                <h3>Desafíos Enfrentados</h3>
+                <ul>
+                    <li><strong>Volumen de datos</strong>: Procesar 5.6M+ registros requiere optimización de memoria y procesamiento</li>
+                    <li><strong>Complejidad de features</strong>: 102 cartas + features agregadas requieren técnicas de reducción de dimensionalidad</li>
+                    <li><strong>Rendimiento de modelos</strong>: Los modelos de regresión muestran R² bajo, indicando alta variabilidad en cambios de trofeos</li>
+                    <li><strong>Estructura de clusters</strong>: Los datos tienen estructura compleja con muchos puntos de ruido</li>
+                </ul>
+
+                <h3>Recomendaciones Futuras</h3>
+                <ol>
+                    <li><strong>Mejora de features</strong>: Explorar features más sofisticadas basadas en sinergias de cartas descubiertas por reglas de asociación</li>
+                    <li><strong>Deep Learning</strong>: Experimentar con redes neuronales para capturar relaciones no lineales complejas</li>
+                    <li><strong>Análisis temporal</strong>: Incorporar análisis de tendencias temporales en el uso de cartas</li>
+                    <li><strong>Interpretabilidad</strong>: Usar SHAP values para explicar predicciones de modelos (ya implementado)</li>
+                    <li><strong>Validación externa</strong>: Probar modelos con datos de temporadas más recientes</li>
+                    <li><strong>Optimización de hiperparámetros</strong>: Expandir grids de búsqueda para mejor rendimiento</li>
+                    <li><strong>Sistema de recomendación</strong>: Desarrollar recomendador de mazos basado en reglas de asociación descubiertas</li>
+                    <li><strong>Monitoreo de anomalías</strong>: Implementar sistema de alertas para detectar cambios significativos en el meta</li>
+                </ol>
+
+                <h3>Valor del Proyecto</h3>
+                <div class="highlight">
+                    <p>Este proyecto demuestra un pipeline completo de Machine Learning desde la comprensión del negocio hasta el despliegue, utilizando mejores prácticas de la industria:</p>
+                    <ul>
+                        <li>✅ Metodología CRISP-DM estructurada</li>
+                        <li>✅ Arquitectura modular y extensible con Kedro</li>
+                        <li>✅ Orquestación automatizada con Airflow</li>
+                        <li>✅ Versionado de datos y modelos con DVC</li>
+                        <li>✅ Containerización para reproducibilidad</li>
+                        <li>✅ Análisis comprehensivo supervisado y no supervisado</li>
+                        <li>✅ Detección de anomalías con múltiples algoritmos</li>
+                        <li>✅ Reglas de asociación para descubrir sinergias entre cartas</li>
+                        <li>✅ Interpretabilidad avanzada con SHAP</li>
+                    </ul>
+                </div>
+
+                <h3>Impacto y Aplicaciones</h3>
+                <p>Los resultados de este proyecto pueden ser utilizados para:</p>
+                <ul>
+                    <li><strong>Jugadores</strong>: Identificar estrategias efectivas y combinaciones de cartas ganadoras</li>
+                    <li><strong>Desarrolladores</strong>: Entender patrones de juego para balanceo de cartas</li>
+                    <li><strong>Análisis de mercado</strong>: Comprender tendencias en el meta del juego</li>
+                    <li><strong>Investigación</strong>: Base para estudios más profundos sobre estrategias de juego</li>
+                </ul>
+            </section>
+        </div>
+
+        <footer>
+            <p>Proyecto ML ClashRoyale - Pipeline Completo de Machine Learning</p>
+            <p>Desarrollado con ❤️ utilizando Kedro, Airflow, DVC y Docker</p>
+            <p>© 2024 - Nicolás Hernández & Gustavo Roldán</p>
+        </footer>
+    </div>
+</body>
+</html>

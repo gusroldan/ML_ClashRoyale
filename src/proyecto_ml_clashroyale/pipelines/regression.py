@@ -2,8 +2,30 @@
 ##Objetivo: predecir el cambio de trofeos del jugador A.
 
 from kedro.pipeline import Pipeline, node
-from typing import Dict
+from typing import Dict, Any
 from proyecto_ml_clashroyale.pipelines.nodes import regression_nodes
+from proyecto_ml_clashroyale.pipelines.nodes import shap_analysis_nodes
+
+
+def _calculate_rf_reg_shap(model_result: Dict[str, Any], train_data, test_data, parameters: Dict[str, Any]) -> Dict[str, Any]:
+    """Wrapper para calcular SHAP de Random Forest (regresión)."""
+    params = parameters.copy()
+    params['model_name'] = 'Random Forest'
+    return shap_analysis_nodes.calculate_shap_values_regression(model_result, train_data, test_data, params)
+
+
+def _calculate_xgb_reg_shap(model_result: Dict[str, Any], train_data, test_data, parameters: Dict[str, Any]) -> Dict[str, Any]:
+    """Wrapper para calcular SHAP de XGBoost (regresión)."""
+    params = parameters.copy()
+    params['model_name'] = 'XGBoost'
+    return shap_analysis_nodes.calculate_shap_values_regression(model_result, train_data, test_data, params)
+
+
+def _calculate_lgbm_reg_shap(model_result: Dict[str, Any], train_data, test_data, parameters: Dict[str, Any]) -> Dict[str, Any]:
+    """Wrapper para calcular SHAP de LightGBM (regresión)."""
+    params = parameters.copy()
+    params['model_name'] = 'LightGBM'
+    return shap_analysis_nodes.calculate_shap_values_regression(model_result, train_data, test_data, params)
 
 
 def create_regression_pipeline(**kwargs) -> Pipeline:
@@ -70,6 +92,35 @@ def create_regression_pipeline(**kwargs) -> Pipeline:
                 outputs="regression_metrics",
                 name="consolidate_regression_metrics_node",
                 tags=["regression", "metrics"],
+            ),
+            # Análisis SHAP para interpretabilidad avanzada
+            node(
+                func=_calculate_rf_reg_shap,
+                inputs=["rf_reg_result", "train_data", "test_data", "params:regression"],
+                outputs="rf_reg_shap",
+                name="calculate_rf_reg_shap_node",
+                tags=["regression", "shap", "interpretability"],
+            ),
+            node(
+                func=_calculate_xgb_reg_shap,
+                inputs=["xgb_reg_result", "train_data", "test_data", "params:regression"],
+                outputs="xgb_reg_shap",
+                name="calculate_xgb_reg_shap_node",
+                tags=["regression", "shap", "interpretability"],
+            ),
+            node(
+                func=_calculate_lgbm_reg_shap,
+                inputs=["lgbm_reg_result", "train_data", "test_data", "params:regression"],
+                outputs="lgbm_reg_shap",
+                name="calculate_lgbm_reg_shap_node",
+                tags=["regression", "shap", "interpretability"],
+            ),
+            node(
+                func=shap_analysis_nodes.create_shap_summary_regression,
+                inputs=["rf_reg_shap", "xgb_reg_shap", "lgbm_reg_shap"],
+                outputs="regression_shap_summary",
+                name="create_regression_shap_summary_node",
+                tags=["regression", "shap", "summary"],
             ),
         ]
     )

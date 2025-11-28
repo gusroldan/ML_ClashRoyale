@@ -203,6 +203,23 @@ classification_metrics:
   type: kedro_datasets.json.JSONDataset
   filepath: data/07_model_output/classification_metrics.json
 
+# SHAP Analysis - Clasificación
+rf_clf_shap:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/rf_clf_shap.json
+
+xgb_clf_shap:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/xgb_clf_shap.json
+
+lgbm_clf_shap:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/lgbm_clf_shap.json
+
+classification_shap_summary:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/08_reporting/classification_shap_summary.json
+
 # Model Outputs - Regresión
 linear_result:
   type: kedro_datasets.pickle.PickleDataset
@@ -255,6 +272,23 @@ lgbm_reg_metrics:
 regression_metrics:
   type: kedro_datasets.json.JSONDataset
   filepath: data/07_model_output/regression_metrics.json
+
+# SHAP Analysis - Regresión
+rf_reg_shap:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/rf_reg_shap.json
+
+xgb_reg_shap:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/xgb_reg_shap.json
+
+lgbm_reg_shap:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/lgbm_reg_shap.json
+
+regression_shap_summary:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/08_reporting/regression_shap_summary.json
 
 classification_comparison:
   type: kedro_datasets.json.JSONDataset
