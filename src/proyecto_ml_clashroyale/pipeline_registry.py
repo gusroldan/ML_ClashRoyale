@@ -13,7 +13,8 @@ from .pipelines import (
     create_unsupervised_learning_pipeline,
     create_dimensionality_reduction_pipeline,
     create_anomaly_detection_pipeline,
-    create_association_rules_pipeline
+    create_association_rules_pipeline,
+    create_reporting_pipeline
 )
 
 
@@ -54,6 +55,9 @@ def register_pipelines() -> dict[str, Pipeline]:
     
     # Pipeline específico para reglas de asociación
     pipelines["association_rules"] = create_association_rules_pipeline()
+    
+    # Pipeline específico para generar reportes consolidados
+    pipelines["reporting"] = create_reporting_pipeline()
     
     # Pipeline por defecto incluye todos los pipelines
     pipelines["__default__"] = sum(pipelines.values())

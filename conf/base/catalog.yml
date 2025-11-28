@@ -406,6 +406,13 @@ association_rules_comparison:
   type: kedro_datasets.json.JSONDataset
   filepath: data/08_reporting/association_rules_comparison.json
 
+models_report:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/08_reporting/models_report.json
+  save_args:
+    indent: 2
+    ensure_ascii: false
+
 final_report:
   type: kedro_datasets.text.TextDataSet
   filepath: data/08_reporting/final_report.md
