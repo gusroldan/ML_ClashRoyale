@@ -102,7 +102,24 @@ regression = BashOperator(
     dag=dag,
 )
 
+# Tarea 6: Pipeline de Clustering (Aprendizaje No Supervisado)
+clustering = BashOperator(
+    task_id='clustering_pipeline',
+    bash_command=f'''
+        set -e
+        cd {PROJECT_ROOT} || {{ echo "Error: No se pudo cambiar a {PROJECT_ROOT}"; exit 1; }}
+        echo "Directorio actual: $(pwd)"
+        echo "Verificando que pyproject.toml existe..."
+        test -f pyproject.toml || {{ echo "Error: pyproject.toml no encontrado"; exit 1; }}
+        echo "Verificando que train_data existe..."
+        test -f data/05_model_input/train_data.csv || {{ echo "Error: train_data.csv no encontrado"; exit 1; }}
+        echo "Ejecutando pipeline: unsupervised_learning"
+        python -m kedro run --pipeline=unsupervised_learning
+    ''',
+    dag=dag,
+)
+
 # Definir orden de ejecución
-business_understanding >> data_cleaning >> feature_engineering >> [classification, regression]
+business_understanding >> data_cleaning >> feature_engineering >> [classification, regression, clustering]
 
 

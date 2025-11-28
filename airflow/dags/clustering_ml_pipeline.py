@@ -13,9 +13,9 @@ default_args = {
 }
 
 dag = DAG(
-    'clashroyale_ml_no_datacleaning',
+    'clustering_ml_pipeline',
     default_args=default_args,
-    description='Pipeline ML sin data_preparation: feature_engineering -> classification & regression',
+    description='Feature Engineering + Clustering (Unsupervised Learning)',
     schedule=None,
     catchup=False,
 )
@@ -37,34 +37,6 @@ feature_engineering = BashOperator(
     dag=dag,
 )
 
-classification = BashOperator(
-    task_id='classification_pipeline',
-    bash_command=f'''
-        set -e
-        cd {PROJECT_ROOT} || {{ echo "Error: No se pudo cambiar a {PROJECT_ROOT}"; exit 1; }}
-        echo "Directorio actual: $(pwd)"
-        echo "Verificando que pyproject.toml existe..."
-        test -f pyproject.toml || {{ echo "Error: pyproject.toml no encontrado en {PROJECT_ROOT}"; ls -la; exit 1; }}
-        echo "Ejecutando pipeline: classification"
-        python -m kedro run --pipeline=classification
-    ''',
-    dag=dag,
-)
-
-regression = BashOperator(
-    task_id='regression_pipeline',
-    bash_command=f'''
-        set -e
-        cd {PROJECT_ROOT} || {{ echo "Error: No se pudo cambiar a {PROJECT_ROOT}"; exit 1; }}
-        echo "Directorio actual: $(pwd)"
-        echo "Verificando que pyproject.toml existe..."
-        test -f pyproject.toml || {{ echo "Error: pyproject.toml no encontrado en {PROJECT_ROOT}"; ls -la; exit 1; }}
-        echo "Ejecutando pipeline: regression"
-        python -m kedro run --pipeline=regression
-    ''',
-    dag=dag,
-)
-
 clustering = BashOperator(
     task_id='clustering_pipeline',
     bash_command=f'''
@@ -81,6 +53,6 @@ clustering = BashOperator(
     dag=dag,
 )
 
-feature_engineering >> [classification, regression, clustering]
+feature_engineering >> clustering
 
 

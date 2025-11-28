@@ -73,3 +73,25 @@ regression:
         max_depth: [3, 5]  # Reducido de 3 a 2 valores
         learning_rate: [0.1, 0.3]  # Reducido de 3 a 2 valores
         n_estimators: [100]  # Solo un valor
+
+# Unsupervised Learning (Clustering) parameters
+unsupervised_learning:
+  random_state: 42
+  models:
+    kmeans:
+      n_clusters: 5  # Número de clusters para K-Means
+      max_iter: 300  # Máximo de iteraciones
+      n_init: 10  # Número de inicializaciones
+      calculate_elbow: true  # Calcular método del codo
+      elbow_k_range: [2, 3, 4, 5, 6, 7, 8, 9, 10]  # Rango de k para método del codo
+    optics:
+      min_samples: 5  # Número mínimo de muestras en un cluster
+      max_eps: null  # Distancia máxima entre muestras (null = sin límite, se convierte a np.inf)
+      metric: 'euclidean'  # Métrica de distancia ('euclidean', 'manhattan', etc.)
+      n_jobs: -1  # Número de trabajos paralelos (-1 = todos los cores)
+    hierarchical:
+      n_clusters: 5  # Número de clusters para Hierarchical Clustering
+      linkage: 'ward'  # Método de linkage ('ward', 'complete', 'average', 'single')
+      metric: 'euclidean'  # Métrica de distancia (solo si linkage != 'ward')
+      calculate_dendrogram: true  # Calcular datos del dendrograma
+      max_samples_dendrogram: 5000  # Máximo de muestras para calcular dendrograma (por rendimiento)

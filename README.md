@@ -525,11 +525,28 @@ kedro jupyter lab
   - Métricas: `data/07_model_output/*_metrics.json`
   - Comparación: `data/08_reporting/regression_comparison.json`
 
+### Clustering (`unsupervised_learning`)
+- **Objetivo**: Identificar patrones y grupos en los datos sin etiquetas
+- **Modelos**: 3 algoritmos de clustering
+  1. **K-Means**: Clustering particional con k clusters fijos
+  2. **OPTICS**: Clustering basado en densidad (encuentra número óptimo de clusters)
+  3. **Hierarchical Clustering**: Clustering jerárquico aglomerativo
+- **Métricas**: 
+  - Silhouette Score (mayor es mejor)
+  - Davies-Bouldin Index (menor es mejor)
+  - Calinski-Harabasz Index (mayor es mejor)
+  - Elbow Method (solo K-Means)
+  - Dendrogramas (solo Hierarchical Clustering)
+- **Salidas**:
+  - Modelos: `data/06_models/clustering/*.pkl`
+  - Métricas: `data/07_model_output/kmeans_metrics.json`, `optics_metrics.json`, `hierarchical_metrics.json`
+  - Comparación: `data/08_reporting/clustering_comparison.json`
+
 ---
 
 ## 📋 DAGs de Airflow
 
-El proyecto incluye 5 DAGs configurados para ejecutar los pipelines de Kedro:
+El proyecto incluye 6 DAGs configurados para ejecutar los pipelines de Kedro:
 
 ### 1. `clashroyale_ml_with_datacleaning` (Completo)
 - **Descripción**: Pipeline ML completo desde la limpieza de datos hasta el entrenamiento
@@ -539,7 +556,8 @@ El proyecto incluye 5 DAGs configurados para ejecutar los pipelines de Kedro:
   3. `feature_engineering` → Ingeniería de features
   4. `classification_pipeline` → Entrenamiento de modelos de clasificación
   5. `regression_pipeline` → Entrenamiento de modelos de regresión
-- **Flujo**: `business_understanding → data_cleaning → feature_engineering → [classification, regression]`
+  6. `clustering_pipeline` → Entrenamiento de modelos de clustering (aprendizaje no supervisado)
+- **Flujo**: `business_understanding → data_cleaning → feature_engineering → [classification, regression, clustering]`
 - **Uso**: Ejecutar el pipeline completo desde cero (requiere datos en `data/01_raw/`)
 
 ### 2. `clashroyale_ml_no_datacleaning` (Sin data cleaning)
@@ -548,7 +566,8 @@ El proyecto incluye 5 DAGs configurados para ejecutar los pipelines de Kedro:
   1. `feature_engineering` → Ingeniería de features
   2. `classification_pipeline` → Entrenamiento de modelos de clasificación
   3. `regression_pipeline` → Entrenamiento de modelos de regresión
-- **Flujo**: `feature_engineering → [classification, regression]`
+  4. `clustering_pipeline` → Entrenamiento de modelos de clustering (aprendizaje no supervisado)
+- **Flujo**: `feature_engineering → [classification, regression, clustering]`
 - **Uso**: Cuando los datos ya están limpios y solo necesitas re-entrenar modelos
 
 ### 3. `classification_ml_pipeline` (Solo clasificación)
@@ -567,7 +586,15 @@ El proyecto incluye 5 DAGs configurados para ejecutar los pipelines de Kedro:
 - **Flujo**: `feature_engineering → regression`
 - **Uso**: Cuando solo necesitas entrenar modelos de regresión
 
-### 5. `data_cleaning_only` (Solo limpieza)
+### 5. `clustering_ml_pipeline` (Solo clustering)
+- **Descripción**: Pipeline completo para entrenar modelos de clustering (aprendizaje no supervisado)
+- **Tareas**:
+  1. `feature_engineering` → Ingeniería de features
+  2. `clustering_pipeline` → Entrenamiento de 3 modelos de clustering (K-Means, OPTICS, Hierarchical)
+- **Flujo**: `feature_engineering → clustering`
+- **Uso**: Cuando solo necesitas entrenar modelos de clustering
+
+### 6. `data_cleaning_only` (Solo limpieza)
 - **Descripción**: Solo ejecuta la limpieza y preparación de datos
 - **Tareas**:
   1. `data_cleaning` → Limpieza y preparación de datos

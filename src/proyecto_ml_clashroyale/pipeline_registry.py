@@ -9,7 +9,8 @@ from .pipelines import (
     create_data_preparation_pipeline,
     create_feature_engineering_pipeline,
     create_classification_pipeline,
-    create_regression_pipeline
+    create_regression_pipeline,
+    create_unsupervised_learning_pipeline
 )
 
 
@@ -38,6 +39,9 @@ def register_pipelines() -> dict[str, Pipeline]:
     
     # Pipeline específico para regresión
     pipelines["regression"] = create_regression_pipeline()
+    
+    # Pipeline específico para clustering (aprendizaje no supervisado)
+    pipelines["unsupervised_learning"] = create_unsupervised_learning_pipeline()
     
     # Pipeline por defecto incluye todos los pipelines
     pipelines["__default__"] = sum(pipelines.values())

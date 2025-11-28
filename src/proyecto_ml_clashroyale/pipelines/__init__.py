@@ -6,6 +6,7 @@ from .data_preparation import create_data_preparation_pipeline
 from .feature_engineering import create_feature_engineering_pipeline
 from .classification import create_classification_pipeline
 from .regression import create_regression_pipeline
+from .unsupervised_learning import create_unsupervised_learning_pipeline
 
 __all__ = [
     "create_business_understanding_pipeline",
@@ -13,6 +14,7 @@ __all__ = [
     "create_data_preparation_pipeline",
     "create_feature_engineering_pipeline",
     "create_classification_pipeline",
-    "create_regression_pipeline"
+    "create_regression_pipeline",
+    "create_unsupervised_learning_pipeline"
 ]
 

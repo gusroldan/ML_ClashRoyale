@@ -264,6 +264,35 @@ regression_comparison:
   type: kedro_datasets.json.JSONDataset
   filepath: data/08_reporting/regression_comparison.json
 
+# Model Outputs - Clustering (Unsupervised Learning)
+kmeans_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/clustering/kmeans_model.pkl
+
+kmeans_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/kmeans_metrics.json
+
+optics_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/clustering/optics_model.pkl
+
+optics_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/optics_metrics.json
+
+hierarchical_result:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/06_models/clustering/hierarchical_model.pkl
+
+hierarchical_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_model_output/hierarchical_metrics.json
+
+clustering_comparison:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/08_reporting/clustering_comparison.json
+
 final_report:
   type: kedro_datasets.text.TextDataSet
   filepath: data/08_reporting/final_report.md
