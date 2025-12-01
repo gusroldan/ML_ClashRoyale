@@ -43,6 +43,13 @@ def create_unsupervised_learning_pipeline(**kwargs) -> Pipeline:
                 name="create_clustering_comparison_node",
                 tags=["unsupervised_learning", "evaluation"],
             ),
+            node(
+                func=unsupervised_learning_nodes.generate_clustering_visualizations,
+                inputs=["train_data", "kmeans_result", "optics_result", "hierarchical_result", "params:unsupervised_learning"],
+                outputs="clustering_visualizations",
+                name="generate_clustering_visualizations_node",
+                tags=["unsupervised_learning", "visualization"],
+            ),
             # Análisis profundo de clusters - OPTICS (mejor modelo)
             node(
                 func=cluster_analysis_nodes.analyze_cluster_statistics,

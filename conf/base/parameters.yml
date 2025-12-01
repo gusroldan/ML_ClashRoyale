@@ -85,6 +85,7 @@ regression:
 # Unsupervised Learning (Clustering) parameters
 unsupervised_learning:
   random_state: 42
+  visualization_output_dir: data/08_reporting/visualizations
   models:
     kmeans:
       n_clusters: 5  # Número de clusters para K-Means
@@ -107,6 +108,7 @@ unsupervised_learning:
 # Dimensionality Reduction parameters
 dimensionality_reduction:
   random_state: 42
+  visualization_output_dir: data/08_reporting/visualizations
   models:
     pca:
       n_components: null  # null = usar variance_threshold, int = número fijo, float = fracción de varianza

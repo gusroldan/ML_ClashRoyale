@@ -226,6 +226,57 @@
             border-radius: 5px;
         }
 
+        .visualization-container {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .visualization-container img {
+            max-width: 100%;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            display: block;
+            object-fit: contain;
+        }
+
+        .visualization-item img {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .visualization-explanation {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: left;
+            border-left: 4px solid #667eea;
+        }
+
+        .visualization-explanation h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .visualization-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .visualization-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
         @media (max-width: 768px) {
             header h1 {
                 font-size: 1.8em;
@@ -637,6 +688,108 @@
                     <strong>Mejor Modelo de Clustering:</strong> OPTICS muestra el mejor Silhouette Score (0.3203) y el mejor Davies-Bouldin Index (1.02), identificando 58 clusters naturales. Sin embargo, detectó 15,521 puntos de ruido, lo que sugiere que los datos tienen una estructura de clusters compleja.
                 </div>
 
+                <h4>Visualizaciones de Clustering</h4>
+
+                <div class="visualization-container">
+                    <h4>Método del Codo - K-Means</h4>
+                    <img src="data/08_reporting/visualizations/kmeans_elbow_method.png" alt="Método del Codo K-Means">
+                    <div class="visualization-explanation">
+                        <h4>¿Qué muestra este gráfico en el contexto de Clash Royale?</h4>
+                        <p>El <strong>método del codo</strong> nos ayuda a determinar cuántos grupos naturales de batallas similares existen en nuestros datos. Cada cluster representa un grupo de batallas con características similares basadas en las features del dataset (diferencia de cartas entre jugadores, niveles de trofeos, distribución de rarezas, etc.).</p>
+                        <p><strong>Interpretación basada en los datos del proyecto:</strong> El gráfico muestra la inercia (cohesión interna) para diferentes valores de k. Según los resultados del proyecto, el punto del "codo" sugiere que <strong>k=5</strong> es un número razonable de clusters para K-Means. Los datos muestran que con 5 clusters se logra un balance entre cohesión interna y número de grupos. Sin embargo, es importante notar que OPTICS encontró 58 clusters naturales, lo que sugiere que la estructura real de los datos es más compleja de lo que K-Means con k=5 puede capturar. Para interpretar qué representan realmente estos 5 clusters en términos de estrategias de Clash Royale, sería necesario analizar los perfiles de clusters (características promedio de cada grupo) que el pipeline puede generar.</p>
+                    </div>
+                </div>
+
+                <div class="visualization-container">
+                    <h4>Dendrograma - Hierarchical Clustering</h4>
+                    <img src="data/08_reporting/visualizations/hierarchical_dendrogram.png" alt="Dendrograma Hierarchical Clustering">
+                    <div class="visualization-explanation">
+                        <h4>¿Qué muestra este gráfico en el contexto de Clash Royale?</h4>
+                        <p>El <strong>dendrograma</strong> muestra cómo diferentes tipos de batallas y estrategias se relacionan entre sí, formando una jerarquía de similitudes.</p>
+                        <p><strong>Interpretación para Clash Royale:</strong> Cada rama del árbol representa un grupo de batallas con características similares. Las batallas que se fusionan cerca de la base del árbol (baja altura) son muy similares - por ejemplo, batallas con mazos casi idénticos o estrategias muy parecidas. A medida que subimos en el árbol, se fusionan grupos más diversos pero relacionados. Por ejemplo, podríamos ver que los "mazos de ciclo rápido" y "mazos de ciclo lento" se fusionan antes que con "mazos de élite", sugiriendo que comparten más características entre sí. Este gráfico es especialmente útil para entender la <strong>taxonomía de estrategias</strong> en Clash Royale: qué estilos de juego son más similares y cómo se relacionan las diferentes meta-estrategias del juego.</p>
+                    </div>
+                </div>
+
+                <div class="visualization-grid">
+                    <div class="visualization-item">
+                        <h4>Visualización de Clusters - K-Means</h4>
+                        <img src="data/08_reporting/visualizations/kmeans_clusters_visualization.png" alt="Clusters K-Means">
+                        <div class="visualization-explanation">
+                            <h4>¿Qué muestra este gráfico en Clash Royale?</h4>
+                            <p>Esta visualización muestra cómo se agrupan las <strong>batallas de Clash Royale</strong> en 5 clusters según K-Means, proyectadas en 2 dimensiones usando PCA para poder visualizarlas.</p>
+                            <p><strong>Interpretación basada en los datos del proyecto:</strong> Cada punto representa una batalla, y los colores indican a qué cluster pertenece según las características del dataset (diferencia de cartas entre jugadores, niveles de trofeos, distribución de rarezas, etc.). Las regiones donde los puntos del mismo color se concentran representan grupos de batallas con características similares.</p>
+                            <p><strong>Resultados observados:</strong> Según las métricas del proyecto, el Silhouette Score de K-Means es 0.0147, lo cual es relativamente bajo. Esto indica que:</p>
+                            <ul>
+                                <li>Los límites entre clusters no son muy claros - hay superposición visible en la visualización</li>
+                                <li>Las batallas comparten muchas características entre diferentes grupos</li>
+                                <li>La estructura de los datos no se ajusta perfectamente a 5 grupos esféricos (como asume K-Means)</li>
+                            </ul>
+                            <p>Para entender qué características específicas definen cada cluster (qué cartas, niveles de trofeos, o estrategias son más comunes en cada grupo), sería necesario analizar los perfiles de clusters que el pipeline puede generar, los cuales muestran las características promedio de cada cluster.</p>
+                        </div>
+                    </div>
+
+                    <div class="visualization-item">
+                        <h4>Visualización de Clusters - OPTICS</h4>
+                        <img src="data/08_reporting/visualizations/optics_clusters_visualization.png" alt="Clusters OPTICS">
+                        <div class="visualization-explanation">
+                            <h4>¿Qué muestra este gráfico en Clash Royale?</h4>
+                            <p>Esta visualización revela la <strong>estructura real de los datos</strong> según OPTICS, el mejor modelo de clustering según las métricas del proyecto. OPTICS encontró <strong>58 clusters naturales</strong>, mucho más que los 5 de K-Means.</p>
+                            <p><strong>Interpretación basada en los resultados del proyecto:</strong> Según los datos:</p>
+                            <ul>
+                                <li><strong>58 clusters identificados</strong>: OPTICS encontró 58 grupos distintos de batallas con características similares</li>
+                                <li><strong>15,521 puntos de ruido</strong>: Representan batallas que no encajan claramente en ningún cluster, lo que sugiere mazos o situaciones únicas</li>
+                                <li><strong>Silhouette Score de 0.3203</strong>: Mucho mejor que K-Means (0.0147), indicando que los clusters están mejor separados</li>
+                                <li><strong>Davies-Bouldin Index de 1.02</strong>: Excelente métrica, indicando clusters compactos y bien separados</li>
+                            </ul>
+                            <p><strong>Implicaciones:</strong> El hecho de que OPTICS encuentre 58 clusters sugiere que la estructura de los datos es más compleja de lo que un enfoque simple de 5 grupos puede capturar. Los puntos de ruido (15,521 batallas) representan una proporción significativa de los datos, lo que indica:</p>
+                            <ul>
+                                <li>Gran diversidad en las características de las batallas</li>
+                                <li>Muchas combinaciones únicas de mazos, niveles de trofeos, y otras características</li>
+                                <li>Posible necesidad de análisis más granular para entender completamente los patrones</li>
+                            </ul>
+                            <p>Para interpretar qué representan específicamente estos 58 clusters en términos de estrategias de Clash Royale, sería necesario analizar los perfiles de clusters generados por el pipeline, que muestran las características promedio (cartas más comunes, niveles de trofeos, distribución de rarezas, etc.) de cada grupo.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="visualization-container">
+                    <h4>Visualización de Clusters - Hierarchical Clustering</h4>
+                    <img src="data/08_reporting/visualizations/hierarchical_clusters_visualization.png" alt="Clusters Hierarchical">
+                    <div class="visualization-explanation">
+                        <h4>¿Qué muestra este gráfico en Clash Royale?</h4>
+                        <p>Esta visualización muestra cómo se agrupan las batallas usando <strong>clustering jerárquico</strong>, que identifica relaciones de similitud entre diferentes tipos de estrategias.</p>
+                        <p><strong>Interpretación para Clash Royale:</strong> A diferencia de K-Means que busca grupos con formas esféricas, el clustering jerárquico puede identificar grupos con formas más naturales e irregulares. Esto es útil en Clash Royale porque:</p>
+                        <ul>
+                            <li>Las estrategias no siempre tienen límites claros - hay mazos híbridos que combinan elementos de múltiples estilos</li>
+                            <li>Algunos clusters pueden representar <strong>familias de mazos</strong> relacionadas (ej: todas las variantes de mazos de Golem)</li>
+                            <li>Los grupos pueden tener formas alargadas que representan <strong>transiciones graduales</strong> entre estrategias</li>
+                        </ul>
+                        <p>La superposición visible y el bajo Silhouette Score (0.0097) reflejan la realidad del juego: <strong>no hay estrategias completamente aisladas</strong>. Los mazos comparten cartas, los jugadores adaptan estrategias, y el meta evoluciona constantemente. Esto hace que sea difícil separar completamente los diferentes estilos de juego, lo cual es una característica natural de un juego tan dinámico como Clash Royale.</p>
+                    </div>
+                </div>
+
+                <div class="visualization-container">
+                    <h4>Comparación de Métricas de Clustering</h4>
+                    <img src="data/08_reporting/visualizations/clustering_metrics_comparison.png" alt="Comparación Métricas Clustering">
+                    <div class="visualization-explanation">
+                        <h4>¿Qué muestra este gráfico en Clash Royale?</h4>
+                        <p>Esta comparación evalúa qué método de clustering identifica mejor los <strong>diferentes tipos de estrategias y estilos de juego</strong> en Clash Royale.</p>
+                        <p><strong>Interpretación para Clash Royale:</strong></p>
+                        <ul>
+                            <li><strong>Silhouette Score (mayor es mejor)</strong>: OPTICS (0.3203) identifica mejor las diferencias entre estrategias. Esto significa que cuando agrupa batallas similares, realmente están relacionadas (mismos tipos de mazos, niveles similares, estrategias comparables).</li>
+                            <li><strong>Davies-Bouldin Index (menor es mejor)</strong>: OPTICS (1.02) crea grupos más coherentes y distintos. En términos del juego, esto significa que cada cluster representa un estilo de juego claramente diferenciado de los demás.</li>
+                            <li><strong>Calinski-Harabasz Index (mayor es mejor)</strong>: K-Means (184.91) tiene mejor score aquí, pero esto puede ser engañoso porque favorece grupos grandes y balanceados. OPTICS encuentra 58 grupos más pequeños pero más precisos, lo cual es más valioso para entender la diversidad real del meta.</li>
+                        </ul>
+                        <p><strong>Conclusión para Clash Royale:</strong> OPTICS es superior porque revela la <strong>verdadera diversidad del meta</strong> - no solo 5 categorías generales, sino 58 estrategias específicas y bien diferenciadas. Esto es más útil para:</p>
+                        <ul>
+                            <li>Entender qué mazos y estrategias realmente existen en el juego</li>
+                            <li>Identificar nichos de estrategias efectivas</li>
+                            <li>Reconocer la innovación y experimentación de los jugadores</li>
+                            <li>Analizar tendencias más granulares en el meta</li>
+                        </ul>
+                    </div>
+                </div>
+
                 <h3>Reducción de Dimensionalidad</h3>
                 <p><strong>Objetivo</strong>: Reducir el número de características manteniendo la información más importante, facilitando visualización y análisis.</p>
 
@@ -665,6 +818,89 @@
                         <li><strong>PCA</strong>: Ideal para datos lineales, mantiene 95% de varianza con 96 componentes, proporciona loadings interpretables.</li>
                         <li><strong>UMAP</strong>: Mejor para visualización, preserva estructura local y global, ideal para análisis exploratorio no lineal.</li>
                     </ul>
+                </div>
+
+                <h4>Visualizaciones de Reducción de Dimensionalidad</h4>
+
+                <div class="visualization-container">
+                    <h4>Varianza Explicada - PCA</h4>
+                    <img src="data/08_reporting/visualizations/pca_variance_explained.png" alt="Varianza Explicada PCA">
+                    <div class="visualization-explanation">
+                        <h4>¿Qué muestra este gráfico en Clash Royale?</h4>
+                        <p>Este gráfico doble muestra cómo podemos simplificar la información de las <strong>111 características</strong> de las batallas (cartas, trofeos, rarezas, etc.) manteniendo la información más importante.</p>
+                        <ul>
+                            <li><strong>Gráfico izquierdo (Scree Plot)</strong>: Muestra qué características o combinaciones de características son más importantes para diferenciar las batallas. Los primeros componentes capturan las diferencias más significativas (ej: mazos agresivos vs defensivos, niveles de trofeos, etc.).</li>
+                            <li><strong>Gráfico derecho (Varianza Acumulada)</strong>: Muestra cuánta información sobre las batallas mantenemos al usar solo los primeros N componentes.</li>
+                        </ul>
+                        <p><strong>Interpretación para Clash Royale:</strong> Con solo <strong>96 componentes principales</strong> mantenemos el <strong>95.04% de la información</strong> sobre las batallas. Esto significa que de las 111 características originales (102 cartas + 9 características adicionales), podemos reducir a 96 "características compuestas" que capturan casi toda la variabilidad. Los primeros componentes probablemente capturan:</p>
+                        <ul>
+                            <li>Diferencias en estilos de juego (agresivo vs defensivo)</li>
+                            <li>Niveles de trofeos y experiencia</li>
+                            <li>Combinaciones de cartas más comunes</li>
+                            <li>Estrategias de rareza (mazos comunes vs mazos de élite)</li>
+                        </ul>
+                        <p>Esto es muy útil porque nos permite trabajar con menos dimensiones sin perder información crítica sobre las estrategias y características de las batallas.</p>
+                    </div>
+                </div>
+
+                <div class="visualization-container">
+                    <h4>Biplot PCA - Proyección 2D</h4>
+                    <img src="data/08_reporting/visualizations/pca_biplot_2d.png" alt="Biplot PCA 2D">
+                    <div class="visualization-explanation">
+                        <h4>¿Qué muestra este gráfico en Clash Royale?</h4>
+                        <p>Esta visualización muestra todas las <strong>batallas de Clash Royale</strong> proyectadas en un espacio 2D, donde cada punto es una batalla y su posición indica qué tan similar es a otras batallas.</p>
+                        <p><strong>Interpretación para Clash Royale:</strong> Los ejes PC1 y PC2 representan las <strong>dos dimensiones más importantes</strong> que diferencian las batallas. Aunque esta visualización solo captura ~20-30% de la información total, nos permite ver patrones importantes:</p>
+                        <ul>
+                            <li><strong>Puntos cercanos</strong>: Representan batallas con mazos similares, niveles de trofeos comparables, o estrategias parecidas</li>
+                            <li><strong>Regiones densas</strong>: Indican tipos de batallas muy comunes (ej: mazos del meta popular)</li>
+                            <li><strong>Regiones dispersas</strong>: Representan batallas más únicas o experimentales</li>
+                            <li><strong>Agrupaciones</strong>: Sugieren diferentes "familias" de estrategias o estilos de juego</li>
+                        </ul>
+                        <p>Esta visualización es especialmente útil para identificar qué tipos de batallas son más comunes y cómo se relacionan diferentes estrategias entre sí. Por ejemplo, podríamos ver que los mazos de ciclo rápido forman una región, mientras que los mazos de élite forman otra región distinta.</p>
+                    </div>
+                </div>
+
+                <div class="visualization-container">
+                    <h4>Visualización UMAP - Proyección 2D</h4>
+                    <img src="data/08_reporting/visualizations/umap_visualization_2d.png" alt="Visualización UMAP 2D">
+                    <div class="visualization-explanation">
+                        <h4>¿Qué muestra este gráfico en Clash Royale?</h4>
+                        <p>Esta visualización usa <strong>UMAP</strong> para mostrar las batallas en 2D, pero a diferencia de PCA, puede capturar <strong>relaciones complejas y no lineales</strong> entre las características de las batallas.</p>
+                        <p><strong>Interpretación para Clash Royale:</strong> UMAP es especialmente poderoso para visualizar datos de Clash Royale porque:</p>
+                        <ul>
+                            <li><strong>Preserva agrupaciones naturales</strong>: Los mazos similares aparecen juntos, incluso si comparten características de manera no obvia (ej: dos mazos diferentes que funcionan bien contra los mismos oponentes)</li>
+                            <li><strong>Revela estructuras ocultas</strong>: Puede mostrar relaciones entre estrategias que no son evidentes con métodos lineales</li>
+                            <li><strong>Muestra el "manifold" del meta</strong>: La estructura real del meta del juego - cómo diferentes estrategias se relacionan entre sí en un espacio complejo</li>
+                        </ul>
+                        <p>En esta visualización podemos observar:</p>
+                        <ul>
+                            <li><strong>Agrupaciones densas</strong>: Representan estrategias muy populares y bien definidas del meta</li>
+                            <li><strong>Filamentos o estructuras alargadas</strong>: Indican transiciones graduales entre estrategias relacionadas (ej: variaciones de un mismo tipo de mazo)</li>
+                            <li><strong>Regiones separadas</strong>: Estrategias completamente diferentes que no comparten características</li>
+                            <li><strong>Puntos aislados</strong>: Mazos únicos o experimentales que no encajan en el meta estándar</li>
+                        </ul>
+                        <p>Esta visualización es ideal para <strong>explorar el meta del juego</strong> y entender cómo se relacionan diferentes estrategias, más allá de las relaciones lineales simples.</p>
+                    </div>
+                </div>
+
+                <div class="visualization-container">
+                    <h4>Comparación PCA vs UMAP</h4>
+                    <img src="data/08_reporting/visualizations/pca_vs_umap_comparison.png" alt="Comparación PCA vs UMAP">
+                    <div class="visualization-explanation">
+                        <h4>¿Qué muestra este gráfico en Clash Royale?</h4>
+                        <p>Esta comparación muestra dos formas diferentes de visualizar el <strong>mismo conjunto de batallas de Clash Royale</strong>, revelando diferentes aspectos de cómo se relacionan las estrategias.</p>
+                        <p><strong>Interpretación para Clash Royale:</strong></p>
+                        <ul>
+                            <li><strong>PCA (izquierda) - Vista Lineal</strong>: Muestra las batallas organizadas según las diferencias más "obvias" y lineales. Es como organizar los mazos por características simples: "muchas cartas comunes" vs "muchas cartas legendarias", o "mazos baratos" vs "mazos caros". Es útil para entender las diferencias principales del meta, pero puede perder relaciones más sutiles.</li>
+                            <li><strong>UMAP (derecha) - Vista No Lineal</strong>: Muestra las batallas organizadas según relaciones más complejas. Es como organizar los mazos por "funcionalidad" o "sinergia" - mazos que funcionan de manera similar aparecen juntos, incluso si no comparten las mismas cartas. Revela la estructura real del meta: qué estrategias son realmente similares en términos de cómo se juegan, no solo en términos de qué cartas contienen.</li>
+                        </ul>
+                        <p><strong>Insights para Clash Royale:</strong> La diferencia entre ambas visualizaciones es muy reveladora:</p>
+                        <ul>
+                            <li>Si ambas se ven similares: Las estrategias se diferencian principalmente por características lineales (nivel de trofeos, rareza de cartas, etc.)</li>
+                            <li>Si UMAP muestra más estructura: Existen relaciones complejas entre estrategias que no son obvias (sinergias, contrametas, estilos de juego similares)</li>
+                        </ul>
+                        <p>En este caso, UMAP revela estructuras más complejas, lo que confirma que el meta de Clash Royale tiene <strong>relaciones no lineales importantes</strong>: dos mazos pueden ser similares en términos de estrategia aunque no compartan cartas, o pueden ser diferentes aunque tengan las mismas cartas pero con diferentes estilos de juego.</p>
+                    </div>
                 </div>
 
                 <h3>Detección de Anomalías</h3>
@@ -1052,3 +1288,5 @@
     </div>
 </body>
 </html>
+
+

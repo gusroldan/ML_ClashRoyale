@@ -327,6 +327,10 @@ clustering_comparison:
   type: kedro_datasets.json.JSONDataset
   filepath: data/08_reporting/clustering_comparison.json
 
+clustering_visualizations:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/08_reporting/clustering_visualizations.pkl
+
 # Model Outputs - Dimensionality Reduction
 pca_result:
   type: kedro_datasets.pickle.PickleDataset
@@ -347,6 +351,10 @@ umap_metrics:
 dimensionality_reduction_comparison:
   type: kedro_datasets.json.JSONDataset
   filepath: data/08_reporting/dimensionality_reduction_comparison.json
+
+dimensionality_reduction_visualizations:
+  type: kedro_datasets.pickle.PickleDataset
+  filepath: data/08_reporting/dimensionality_reduction_visualizations.pkl
 
 # Model Outputs - Anomaly Detection
 isolation_forest_result:

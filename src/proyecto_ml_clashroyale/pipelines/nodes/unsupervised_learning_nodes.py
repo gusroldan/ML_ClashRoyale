@@ -6,9 +6,13 @@ from typing import Dict, Any, Tuple, List
 from sklearn.cluster import KMeans, OPTICS, AgglomerativeClustering
 from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
 from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 from scipy.cluster.hierarchy import dendrogram, linkage
+import matplotlib.pyplot as plt
+import seaborn as sns
 import logging
 import json
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -437,4 +441,197 @@ def create_clustering_comparison(
     logger.info("Comparación de clustering completada")
     
     return comparison
+
+
+def generate_clustering_visualizations(
+    train_data: pd.DataFrame,
+    kmeans_result: Dict[str, Any],
+    optics_result: Dict[str, Any],
+    hierarchical_result: Dict[str, Any],
+    parameters: Dict[str, Any]
+) -> Dict[str, str]:
+    """Generar y guardar visualizaciones de clustering en formato PNG.
+    
+    Args:
+        train_data: Datos de entrenamiento
+        kmeans_result: Resultado de K-Means
+        optics_result: Resultado de OPTICS
+        hierarchical_result: Resultado de Hierarchical Clustering
+        parameters: Parámetros de configuración
+        
+    Returns:
+        Diccionario con las rutas de los archivos PNG generados
+    """
+    logger.info("Generando visualizaciones de clustering...")
+    
+    # Configurar estilo
+    try:
+        plt.style.use('seaborn-v0_8-darkgrid')
+    except:
+        try:
+            plt.style.use('seaborn-darkgrid')
+        except:
+            plt.style.use('default')
+    sns.set_palette("husl")
+    
+    output_dir = parameters.get('visualization_output_dir', 'data/08_reporting/visualizations')
+    os.makedirs(output_dir, exist_ok=True)
+    
+    X = _extract_features(train_data)
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+    X_scaled_df = pd.DataFrame(X_scaled, columns=X.columns)
+    
+    generated_files = {}
+    
+    # 1. Gráfico del método del codo (K-Means)
+    if 'elbow_method' in kmeans_result.get('metrics', {}):
+        elbow_data = kmeans_result['metrics']['elbow_method']
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.plot(elbow_data['k_values'], elbow_data['inertias'], marker='o', linewidth=2, markersize=8)
+        ax.set_xlabel('Número de Clusters (k)', fontsize=12)
+        ax.set_ylabel('Inercia (Within-cluster Sum of Squares)', fontsize=12)
+        ax.set_title('Método del Codo - K-Means', fontsize=14, fontweight='bold')
+        ax.grid(True, alpha=0.3)
+        plt.tight_layout()
+        elbow_path = os.path.join(output_dir, 'kmeans_elbow_method.png')
+        plt.savefig(elbow_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        generated_files['kmeans_elbow'] = elbow_path
+        logger.info(f"Grafíco del método del codo guardado en: {elbow_path}")
+    
+    # 2. Dendrograma (Hierarchical Clustering)
+    if 'dendrogram_data' in hierarchical_result.get('metrics', {}):
+        dendro_data = hierarchical_result['metrics']['dendrogram_data']
+        linkage_matrix = np.array(dendro_data['linkage_matrix'])
+        
+        # Para datasets grandes, mostrar solo los últimos merges
+        max_display = min(50, len(linkage_matrix) + 1)
+        
+        fig, ax = plt.subplots(figsize=(15, 8))
+        dendrogram(
+            linkage_matrix,
+            truncate_mode='lastp',
+            p=max_display,
+            leaf_rotation=90,
+            leaf_font_size=8,
+            ax=ax
+        )
+        ax.set_xlabel('Muestras o (Cluster Size)', fontsize=12)
+        ax.set_ylabel('Distancia', fontsize=12)
+        ax.set_title('Dendrograma - Hierarchical Clustering', fontsize=14, fontweight='bold')
+        plt.tight_layout()
+        dendro_path = os.path.join(output_dir, 'hierarchical_dendrogram.png')
+        plt.savefig(dendro_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        generated_files['hierarchical_dendrogram'] = dendro_path
+        logger.info(f"Dendrograma guardado en: {dendro_path}")
+    
+    # 3. Visualización de clusters usando PCA (2D)
+    # Reducir a 2D para visualización
+    pca_vis = PCA(n_components=2, random_state=parameters.get('random_state', 42))
+    X_2d = pca_vis.fit_transform(X_scaled_df)
+    
+    # K-Means clusters
+    kmeans_labels = kmeans_result.get('labels', [])
+    if len(kmeans_labels) > 0:
+        fig, ax = plt.subplots(figsize=(12, 8))
+        scatter = ax.scatter(X_2d[:, 0], X_2d[:, 1], c=kmeans_labels, cmap='viridis', 
+                           s=20, alpha=0.6, edgecolors='k', linewidth=0.5)
+        ax.set_xlabel(f'Primer Componente Principal (Varianza: {pca_vis.explained_variance_ratio_[0]:.2%})', fontsize=11)
+        ax.set_ylabel(f'Segundo Componente Principal (Varianza: {pca_vis.explained_variance_ratio_[1]:.2%})', fontsize=11)
+        ax.set_title('Visualización de Clusters - K-Means (PCA 2D)', fontsize=14, fontweight='bold')
+        plt.colorbar(scatter, ax=ax, label='Cluster')
+        plt.tight_layout()
+        kmeans_vis_path = os.path.join(output_dir, 'kmeans_clusters_visualization.png')
+        plt.savefig(kmeans_vis_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        generated_files['kmeans_visualization'] = kmeans_vis_path
+        logger.info(f"Visualización K-Means guardada en: {kmeans_vis_path}")
+    
+    # OPTICS clusters
+    optics_labels = optics_result.get('labels', [])
+    if len(optics_labels) > 0:
+        fig, ax = plt.subplots(figsize=(12, 8))
+        # Manejar puntos de ruido (label = -1)
+        unique_labels = set(optics_labels)
+        n_clusters = len(unique_labels) - (1 if -1 in unique_labels else 0)
+        
+        scatter = ax.scatter(X_2d[:, 0], X_2d[:, 1], c=optics_labels, cmap='tab20', 
+                           s=20, alpha=0.6, edgecolors='k', linewidth=0.5)
+        ax.set_xlabel(f'Primer Componente Principal (Varianza: {pca_vis.explained_variance_ratio_[0]:.2%})', fontsize=11)
+        ax.set_ylabel(f'Segundo Componente Principal (Varianza: {pca_vis.explained_variance_ratio_[1]:.2%})', fontsize=11)
+        ax.set_title(f'Visualización de Clusters - OPTICS (PCA 2D)\n{n_clusters} clusters detectados', 
+                    fontsize=14, fontweight='bold')
+        plt.colorbar(scatter, ax=ax, label='Cluster')
+        plt.tight_layout()
+        optics_vis_path = os.path.join(output_dir, 'optics_clusters_visualization.png')
+        plt.savefig(optics_vis_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        generated_files['optics_visualization'] = optics_vis_path
+        logger.info(f"Visualización OPTICS guardada en: {optics_vis_path}")
+    
+    # Hierarchical clusters
+    hierarchical_labels = hierarchical_result.get('labels', [])
+    if len(hierarchical_labels) > 0:
+        fig, ax = plt.subplots(figsize=(12, 8))
+        scatter = ax.scatter(X_2d[:, 0], X_2d[:, 1], c=hierarchical_labels, cmap='Set3', 
+                           s=20, alpha=0.6, edgecolors='k', linewidth=0.5)
+        ax.set_xlabel(f'Primer Componente Principal (Varianza: {pca_vis.explained_variance_ratio_[0]:.2%})', fontsize=11)
+        ax.set_ylabel(f'Segundo Componente Principal (Varianza: {pca_vis.explained_variance_ratio_[1]:.2%})', fontsize=11)
+        ax.set_title('Visualización de Clusters - Hierarchical Clustering (PCA 2D)', 
+                    fontsize=14, fontweight='bold')
+        plt.colorbar(scatter, ax=ax, label='Cluster')
+        plt.tight_layout()
+        hierarchical_vis_path = os.path.join(output_dir, 'hierarchical_clusters_visualization.png')
+        plt.savefig(hierarchical_vis_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        generated_files['hierarchical_visualization'] = hierarchical_vis_path
+        logger.info(f"Visualización Hierarchical guardada en: {hierarchical_vis_path}")
+    
+    # 4. Comparación de métricas
+    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    
+    models = ['K-Means', 'OPTICS', 'Hierarchical']
+    silhouette_scores = [
+        kmeans_result['metrics']['silhouette_score'],
+        optics_result['metrics']['silhouette_score'],
+        hierarchical_result['metrics']['silhouette_score']
+    ]
+    davies_bouldin = [
+        kmeans_result['metrics']['davies_bouldin_index'],
+        optics_result['metrics']['davies_bouldin_index'],
+        hierarchical_result['metrics']['davies_bouldin_index']
+    ]
+    calinski_harabasz = [
+        kmeans_result['metrics']['calinski_harabasz_index'],
+        optics_result['metrics']['calinski_harabasz_index'],
+        hierarchical_result['metrics']['calinski_harabasz_index']
+    ]
+    
+    axes[0].bar(models, silhouette_scores, color=['#3498db', '#e74c3c', '#2ecc71'])
+    axes[0].set_ylabel('Silhouette Score', fontsize=11)
+    axes[0].set_title('Silhouette Score (mayor es mejor)', fontsize=12, fontweight='bold')
+    axes[0].grid(axis='y', alpha=0.3)
+    
+    axes[1].bar(models, davies_bouldin, color=['#3498db', '#e74c3c', '#2ecc71'])
+    axes[1].set_ylabel('Davies-Bouldin Index', fontsize=11)
+    axes[1].set_title('Davies-Bouldin Index (menor es mejor)', fontsize=12, fontweight='bold')
+    axes[1].grid(axis='y', alpha=0.3)
+    
+    axes[2].bar(models, calinski_harabasz, color=['#3498db', '#e74c3c', '#2ecc71'])
+    axes[2].set_ylabel('Calinski-Harabasz Index', fontsize=11)
+    axes[2].set_title('Calinski-Harabasz Index (mayor es mejor)', fontsize=12, fontweight='bold')
+    axes[2].grid(axis='y', alpha=0.3)
+    
+    plt.tight_layout()
+    metrics_comparison_path = os.path.join(output_dir, 'clustering_metrics_comparison.png')
+    plt.savefig(metrics_comparison_path, dpi=300, bbox_inches='tight')
+    plt.close()
+    generated_files['metrics_comparison'] = metrics_comparison_path
+    logger.info(f"Comparación de métricas guardada en: {metrics_comparison_path}")
+    
+    logger.info(f"Total de visualizaciones generadas: {len(generated_files)}")
+    
+    return generated_files
 

@@ -6,7 +6,10 @@ from typing import Dict, Any, Tuple
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 import umap
+import matplotlib.pyplot as plt
+import seaborn as sns
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -292,4 +295,185 @@ def create_dimensionality_reduction_comparison(
     logger.info("Comparación de reducción de dimensionalidad completada")
     
     return comparison
+
+
+def generate_dimensionality_reduction_visualizations(
+    train_data: pd.DataFrame,
+    pca_result: Dict[str, Any],
+    umap_result: Dict[str, Any],
+    parameters: Dict[str, Any]
+) -> Dict[str, str]:
+    """Generar y guardar visualizaciones de reducción de dimensionalidad en formato PNG.
+    
+    Args:
+        train_data: Datos de entrenamiento
+        pca_result: Resultado de PCA
+        umap_result: Resultado de UMAP
+        parameters: Parámetros de configuración
+        
+    Returns:
+        Diccionario con las rutas de los archivos PNG generados
+    """
+    logger.info("Generando visualizaciones de reducción de dimensionalidad...")
+    
+    # Configurar estilo
+    try:
+        plt.style.use('seaborn-v0_8-darkgrid')
+    except:
+        try:
+            plt.style.use('seaborn-darkgrid')
+        except:
+            plt.style.use('default')
+    sns.set_palette("husl")
+    
+    output_dir = parameters.get('visualization_output_dir', 'data/08_reporting/visualizations')
+    os.makedirs(output_dir, exist_ok=True)
+    
+    X = _extract_features(train_data)
+    generated_files = {}
+    
+    # 1. Gráfico de varianza explicada acumulada (PCA)
+    if 'explained_variance' in pca_result.get('metrics', {}):
+        explained_var = pca_result['metrics']['explained_variance']
+        cumulative_var = explained_var['cumulative']
+        per_component_var = explained_var['per_component']
+        n_components = len(cumulative_var)
+        
+        fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+        
+        # Gráfico de varianza explicada por componente (Scree Plot)
+        axes[0].bar(range(1, min(n_components + 1, 21)), per_component_var[:20], 
+                   color='steelblue', alpha=0.7)
+        axes[0].set_xlabel('Componente Principal', fontsize=12)
+        axes[0].set_ylabel('Varianza Explicada', fontsize=12)
+        axes[0].set_title('Scree Plot - Varianza Explicada por Componente (PCA)', 
+                         fontsize=13, fontweight='bold')
+        axes[0].grid(axis='y', alpha=0.3)
+        if n_components > 20:
+            axes[0].set_xlim(0, 21)
+        
+        # Gráfico de varianza acumulada
+        axes[1].plot(range(1, n_components + 1), cumulative_var, 
+                    marker='o', linewidth=2, markersize=6, color='coral')
+        axes[1].axhline(y=0.95, color='r', linestyle='--', label='95% Varianza', alpha=0.7)
+        axes[1].axhline(y=0.90, color='orange', linestyle='--', label='90% Varianza', alpha=0.7)
+        axes[1].set_xlabel('Número de Componentes', fontsize=12)
+        axes[1].set_ylabel('Varianza Explicada Acumulada', fontsize=12)
+        axes[1].set_title('Varianza Explicada Acumulada (PCA)', fontsize=13, fontweight='bold')
+        axes[1].legend()
+        axes[1].grid(True, alpha=0.3)
+        axes[1].set_ylim(0, 1.05)
+        
+        plt.tight_layout()
+        pca_variance_path = os.path.join(output_dir, 'pca_variance_explained.png')
+        plt.savefig(pca_variance_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        generated_files['pca_variance'] = pca_variance_path
+        logger.info(f"Gráfico de varianza PCA guardado en: {pca_variance_path}")
+    
+    # 2. Biplot de PCA (primeros 2 componentes)
+    if 'transformed_data' in pca_result:
+        X_pca = pca_result['transformed_data']
+        if X_pca.shape[1] >= 2:
+            # Submuestrear si hay muchos puntos para mejorar la visualización
+            n_samples_vis = min(5000, len(X_pca))
+            if len(X_pca) > n_samples_vis:
+                indices = np.random.choice(len(X_pca), n_samples_vis, replace=False)
+                X_pca_vis = X_pca[indices]
+            else:
+                X_pca_vis = X_pca
+            
+            fig, ax = plt.subplots(figsize=(12, 10))
+            scatter = ax.scatter(X_pca_vis[:, 0], X_pca_vis[:, 1], 
+                               s=15, alpha=0.5, c=range(len(X_pca_vis)), 
+                               cmap='viridis', edgecolors='k', linewidth=0.3)
+            ax.set_xlabel(f'Primer Componente Principal (PC1)\nVarianza: {pca_result["metrics"]["explained_variance"]["per_component"][0]:.2%}', 
+                         fontsize=11)
+            ax.set_ylabel(f'Segundo Componente Principal (PC2)\nVarianza: {pca_result["metrics"]["explained_variance"]["per_component"][1]:.2%}', 
+                         fontsize=11)
+            ax.set_title('Visualización PCA - Primeros 2 Componentes Principales', 
+                        fontsize=14, fontweight='bold')
+            plt.colorbar(scatter, ax=ax, label='Índice de Muestra')
+            plt.tight_layout()
+            pca_biplot_path = os.path.join(output_dir, 'pca_biplot_2d.png')
+            plt.savefig(pca_biplot_path, dpi=300, bbox_inches='tight')
+            plt.close()
+            generated_files['pca_biplot'] = pca_biplot_path
+            logger.info(f"Biplot PCA guardado en: {pca_biplot_path}")
+    
+    # 3. Visualización UMAP (2D)
+    if 'transformed_data' in umap_result:
+        X_umap = umap_result['transformed_data']
+        if X_umap.shape[1] >= 2:
+            # Submuestrear si hay muchos puntos
+            n_samples_vis = min(5000, len(X_umap))
+            if len(X_umap) > n_samples_vis:
+                indices = np.random.choice(len(X_umap), n_samples_vis, replace=False)
+                X_umap_vis = X_umap[indices]
+            else:
+                X_umap_vis = X_umap
+            
+            fig, ax = plt.subplots(figsize=(12, 10))
+            scatter = ax.scatter(X_umap_vis[:, 0], X_umap_vis[:, 1], 
+                               s=15, alpha=0.5, c=range(len(X_umap_vis)), 
+                               cmap='plasma', edgecolors='k', linewidth=0.3)
+            ax.set_xlabel('Primera Dimensión UMAP', fontsize=12)
+            ax.set_ylabel('Segunda Dimensión UMAP', fontsize=12)
+            ax.set_title('Visualización UMAP - Proyección 2D', fontsize=14, fontweight='bold')
+            plt.colorbar(scatter, ax=ax, label='Índice de Muestra')
+            plt.tight_layout()
+            umap_vis_path = os.path.join(output_dir, 'umap_visualization_2d.png')
+            plt.savefig(umap_vis_path, dpi=300, bbox_inches='tight')
+            plt.close()
+            generated_files['umap_visualization'] = umap_vis_path
+            logger.info(f"Visualización UMAP guardada en: {umap_vis_path}")
+    
+    # 4. Comparación PCA vs UMAP (lado a lado)
+    if 'transformed_data' in pca_result and 'transformed_data' in umap_result:
+        X_pca = pca_result['transformed_data']
+        X_umap = umap_result['transformed_data']
+        
+        if X_pca.shape[1] >= 2 and X_umap.shape[1] >= 2:
+            n_samples_vis = min(3000, len(X_pca))
+            if len(X_pca) > n_samples_vis:
+                indices = np.random.choice(len(X_pca), n_samples_vis, replace=False)
+                X_pca_vis = X_pca[indices]
+                X_umap_vis = X_umap[indices]
+            else:
+                X_pca_vis = X_pca
+                X_umap_vis = X_umap
+            
+            fig, axes = plt.subplots(1, 2, figsize=(18, 8))
+            
+            # PCA
+            scatter1 = axes[0].scatter(X_pca_vis[:, 0], X_pca_vis[:, 1], 
+                                      s=15, alpha=0.5, c=range(len(X_pca_vis)), 
+                                      cmap='viridis', edgecolors='k', linewidth=0.2)
+            axes[0].set_xlabel(f'PC1 (Varianza: {pca_result["metrics"]["explained_variance"]["per_component"][0]:.2%})', 
+                              fontsize=11)
+            axes[0].set_ylabel(f'PC2 (Varianza: {pca_result["metrics"]["explained_variance"]["per_component"][1]:.2%})', 
+                              fontsize=11)
+            axes[0].set_title('PCA - Proyección Lineal', fontsize=13, fontweight='bold')
+            plt.colorbar(scatter1, ax=axes[0], label='Índice')
+            
+            # UMAP
+            scatter2 = axes[1].scatter(X_umap_vis[:, 0], X_umap_vis[:, 1], 
+                                      s=15, alpha=0.5, c=range(len(X_umap_vis)), 
+                                      cmap='plasma', edgecolors='k', linewidth=0.2)
+            axes[1].set_xlabel('UMAP Dimensión 1', fontsize=11)
+            axes[1].set_ylabel('UMAP Dimensión 2', fontsize=11)
+            axes[1].set_title('UMAP - Proyección No Lineal', fontsize=13, fontweight='bold')
+            plt.colorbar(scatter2, ax=axes[1], label='Índice')
+            
+            plt.suptitle('Comparación: PCA vs UMAP', fontsize=16, fontweight='bold', y=1.02)
+            plt.tight_layout()
+            comparison_path = os.path.join(output_dir, 'pca_vs_umap_comparison.png')
+            plt.savefig(comparison_path, dpi=300, bbox_inches='tight')
+            plt.close()
+            generated_files['pca_umap_comparison'] = comparison_path
+            logger.info(f"Comparación PCA vs UMAP guardada en: {comparison_path}")
+    
+    logger.info(f"Total de visualizaciones generadas: {len(generated_files)}")
+    
+    return generated_files
 

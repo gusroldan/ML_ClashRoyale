@@ -35,6 +35,13 @@ def create_dimensionality_reduction_pipeline(**kwargs) -> Pipeline:
                 name="create_dimensionality_reduction_comparison_node",
                 tags=["dimensionality_reduction", "evaluation"],
             ),
+            node(
+                func=dimensionality_reduction_nodes.generate_dimensionality_reduction_visualizations,
+                inputs=["train_data", "pca_result", "umap_result", "params:dimensionality_reduction"],
+                outputs="dimensionality_reduction_visualizations",
+                name="generate_dimensionality_reduction_visualizations_node",
+                tags=["dimensionality_reduction", "visualization"],
+            ),
         ]
     )
 
